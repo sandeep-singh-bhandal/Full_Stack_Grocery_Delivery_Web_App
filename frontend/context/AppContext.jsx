@@ -15,7 +15,7 @@ export const AppContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState({});
 
-  // Fetach products from backend (dummy here)
+  // Fetch products from backend (dummy here)
   const fetchProducts = async () => {
     setProducts(dummyProducts);
   };
@@ -38,24 +38,40 @@ export const AppContextProvider = ({ children }) => {
     cartData[itemId] = quantity;
     setCartItems(cartData);
     toast.success("Cart updated");
-    // if(quantity === 0){
-    //   delete cartData[itemId];
-    // }else{
-    //   cartData[itemId] = quantity;
-    // }
   };
 
   // Remove from cart function
   const removeFromCart = (itemId) => {
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
-      cartData[itemId] = -1;
+      cartData[itemId] -= 1;
       if (cartData[itemId] === 0) {
         delete cartData[itemId];
       }
     }
     toast.success("Item removed from cart");
     setCartItems(cartData);
+  };
+
+  // Get cart item count
+  const getCartItemCount = () => {
+    let count = 0;
+    for (const item in cartItems) {
+      count += cartItems[item];
+    }
+    return count;
+  };
+
+  // Get cart total amount
+  const getCartAmount = () => {
+    let amount = 0;
+    for (const item in cartItems) {
+      let itemInfo = products.find((prod) => prod._id === item);
+      if (cartItems[item] > 0) {
+        amount += itemInfo.offerPrice * cartItems[item];
+      }
+    }
+    return Math.floor(amount * 100) / 100;
   };
 
   useEffect(() => {
@@ -78,6 +94,8 @@ export const AppContextProvider = ({ children }) => {
     removeFromCart,
     searchQuery,
     setSearchQuery,
+    getCartItemCount,
+    getCartAmount,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

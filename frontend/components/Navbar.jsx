@@ -11,6 +11,7 @@ const Navbar = () => {
     navigate,
     searchQuery,
     setSearchQuery,
+    getCartItemCount,
   } = useAppContext();
 
   const logout = async () => {
@@ -41,7 +42,7 @@ const Navbar = () => {
             className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
             type="text"
             placeholder="Search products"
-            onChange={(e)=>setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <img src={assets.search_icon} alt="search" className="w-4 h-4" />
         </div>
@@ -56,7 +57,7 @@ const Navbar = () => {
             className="w-6 opacity-80"
           />
           <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
-            3
+            {getCartItemCount()}
           </button>
         </div>
 
@@ -87,21 +88,35 @@ const Navbar = () => {
           </div>
         )}
       </div>
+      <div className="flex items-center gap-6 sm:hidden">
+        <div
+          onClick={() => navigate("/cart")}
+          className="relative cursor-pointer"
+        >
+          <img
+            src={assets.nav_cart_icon}
+            alt="cart"
+            className="w-6 opacity-80"
+          />
+          <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
+            {getCartItemCount()}
+          </button>
+        </div>
 
-      <button
-        onClick={() => setOpen(!open)}
-        aria-label="Menu"
-        className="sm:hidden"
-      >
-        {/* Menu Icon SVG */}
-        <img src={assets.menu_icon} alt="menu" />
-      </button>
+        <button
+          onClick={() => setOpen(!open)}
+          aria-label="Menu"
+        >
+          {/* Menu Icon SVG */}
+          <img src={assets.menu_icon} alt="menu" />
+        </button>
+      </div>
 
       {/* Mobile Menu */}
       <div
         className={`${
           open ? "flex" : "hidden"
-        } absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
+        } absolute top-[60px] left-0 w-full bg-white shadow-md py-4 z-100 flex-col items-start gap-2 px-5 text-sm md:hidden`}
       >
         <NavLink to="/" onClick={() => setOpen(false)}>
           Home
