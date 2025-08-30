@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import connectDatabase from "./Config/db.js";
-import userRouter from "./Routes/userRoute.js";
+import userRouter from "./Routes/userRoutes.js";
+import sellerRouter from "./Routes/sellerRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -20,11 +21,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
+// API
 app.use("/api/user", userRouter);
+app.use("/api/seller", sellerRouter);
 
-app.get("/", (req, res) => {
-  res.send("Server Chalpeya Oyee!!");
-});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
