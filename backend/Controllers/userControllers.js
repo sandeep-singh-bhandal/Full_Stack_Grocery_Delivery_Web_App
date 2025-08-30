@@ -88,3 +88,30 @@ export const login = async (req, res) => {
     res.json({ success: false, message: err.message });
   }
 };
+
+//Check Auth - /api/user/is-auth
+export const isAuth = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const user = await UserModel.findById(userId).select("-password");
+    return res.json({ success: true, message: user });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// Logout User - /api/user/logout
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+    return res.json({ success: true, message: "Logged Out Successfully" });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
