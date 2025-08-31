@@ -1,12 +1,24 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const SellerLayout = () => {
+  const { axios,navigate } = useAppContext();
+
   const logout = async () => {
-    setIsSeller(false);
+    try {
+      const { data } = await axios.get("/api/seller/logout");
+      if (data.success) {
+        toast.success(data.message);
+        navigate('/')
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
-  const { isSeller, setIsSeller } = useAppContext();
 
   const sidebarLinks = [
     { name: "Add Product", path: "/seller", icon: assets.add_icon },
@@ -32,7 +44,7 @@ const SellerLayout = () => {
           <p>Hi! Admin</p>
           <button
             onClick={logout}
-            className="border rounded-full text-sm px-4 py-1"
+            className="border rounded-full text-sm px-4 py-1 cursor-pointer hover:bg-primary hover:text-white"
           >
             Logout
           </button>
@@ -44,8 +56,8 @@ const SellerLayout = () => {
             <NavLink
               to={item.path}
               key={item.name}
-              end={item.path=== "/seller"}
-              className={({isActive})=>`flex items-center py-3 px-4 gap-3 
+              end={item.path === "/seller"}
+              className={({ isActive }) => `flex items-center py-3 px-4 gap-3 
                             ${
                               isActive
                                 ? "border-r-4 md:border-r-[6px] bg-primary/10 border-primary text-primary-dull"
@@ -57,7 +69,7 @@ const SellerLayout = () => {
             </NavLink>
           ))}
         </div>
-        <Outlet/>
+        <Outlet />
       </div>
     </>
   );
