@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { assets, categories } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const AddProduct = () => {
   const [files, setFiles] = useState([]);
@@ -8,9 +10,40 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
+  const { axios } = useAppContext();
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+      const productData = {
+        name,
+        description: description.split("\n"),
+        category,
+        price,
+        offerPrice,
+      };
+
+      const formData = new FormData();
+      formData.append("productData", JSON.stringify(productData));
+      for (let i = 0; i < files.length; i++) {
+        formData.append("images", files[i]);
+      }
+
+      const { data } = await axios.post("/api/product/add", formData);
+      if (data.success) {
+        toast.success(data.message);
+        setName("");
+        setDescription("");
+        setPrice("");
+        setCategory("");
+        setOfferPrice("");
+        setFiles([]);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -61,7 +94,7 @@ const AddProduct = () => {
                       setFiles(updatedFiles);
                     }}
                   >
-                      <img src={assets.remove_icon} alt="remove" />
+                    <img src={assets.remove_icon} alt="remove" />
                   </button>
                 </label>
               ))}
