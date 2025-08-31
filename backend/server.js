@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Allowed URLs to access the backend
-const allowedOrigins = ["https://localhost:5173"];
+const allowedOrigins = ["http://localhost:5173"];
 
 // Connecting To Mongo DB
 await connectDatabase();
