@@ -9,6 +9,7 @@ import { connectCloudinary } from "./Config/cloudinary.js";
 import productRouter from "./Routes/productRoutes.js";
 import { cartRouter } from "./Routes/cartRoutes.js";
 import { addressRouter } from "./Routes/addressRoutes.js";
+import { orderRouter } from "./Routes/orderRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/seller", sellerRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
+app.use("/api/orders", orderRouter);
 
 
 app.listen(port, () => {
