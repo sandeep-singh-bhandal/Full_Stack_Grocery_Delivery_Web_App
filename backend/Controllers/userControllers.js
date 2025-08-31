@@ -94,7 +94,7 @@ export const isAuth = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await UserModel.findById(userId).select("-password");
-    return res.json({ success: true, message: user });
+    return res.json({ success: true, user });
   } catch (err) {
     console.log(err.message);
     res.json({ success: false, message: err.message });
