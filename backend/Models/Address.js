@@ -6,7 +6,7 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    firtName: {
+    firstName: {
       type: String,
       required: true,
     },
@@ -28,22 +28,21 @@ const addressSchema = new mongoose.Schema(
     },
     state: {
       type: String,
-      default: true,
+      required: true,
     },
-    zipcode: {
+    zipCode: {
       type: Number,
-      default: true,
+      required: true,
     },
     country: {
       type: String,
-      default: true,
+      required: true,
     },
     phone: {
       type: Number,
-      default: true,
+      required: true,
     },
   },
-  { timestamps: true }
 );
 
 const AddressModel =
