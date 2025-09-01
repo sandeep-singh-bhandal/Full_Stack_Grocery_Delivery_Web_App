@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const InputField = ({ type, placeholder, handleChange, name, address }) => (
   <input
@@ -13,6 +15,7 @@ const InputField = ({ type, placeholder, handleChange, name, address }) => (
   />
 );
 const AddAddress = () => {
+  const { axios, user, navigate } = useAppContext();
   const [address, setAddress] = useState({
     firstName: "",
     lastName: "",
@@ -25,9 +28,27 @@ const AddAddress = () => {
     phone: "",
   });
 
-  const onSubmitHandler = (e) => {
-    e.preventDefault();
+  const onSubmitHandler = async (e) => {
+    try {
+      e.preventDefault();
+      const { data } = await axios.post("/api/address/add", { address });
+      if (data.success) {
+        toast.success(data.message);
+        navigate("/cart");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/cart");
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddress({ ...address, [name]: value });
@@ -92,7 +113,7 @@ const AddAddress = () => {
                 type="number"
                 handleChange={handleChange}
                 address={address}
-                name="zipcode"
+                name="zipCode"
                 placeholder={"Enter Your Zip Code"}
               />
               <InputField
@@ -110,7 +131,9 @@ const AddAddress = () => {
               name="phone"
               placeholder={"Enter Your Phone Number "}
             />
-            <button className="w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase">Save Address</button>
+            <button className="w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase">
+              Save Address
+            </button>
           </form>
         </div>
         <img

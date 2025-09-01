@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { dummyOrders } from "../assets/assets";
 
 const MyOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
-  const { currency } = useAppContext();
+  const { currency, axios, user } = useAppContext();
 
   const fetchMyOrders = async () => {
-    setMyOrders(dummyOrders);
+    try {
+      const { data } = await axios.get("/api/orders/user");
+      
+      if (data.success) {
+        setMyOrders(data.orders);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    fetchMyOrders();
-  }, []);
+    if (user) fetchMyOrders();
+  }, [user]);
 
   return (
     <div className="mt-16 pb-16">
@@ -37,8 +44,8 @@ const MyOrders = () => {
             <div
               className={`relative bg-white text-gray-500/70 
                 ${
-                order.items.length !== index + 1 && "border-b"
-              } border-gray-300 flex flex-col md:flex-row md:items-center justify-between p-4 py-5 md:gap-16 w-full max-w-4xl`}
+                  order.items.length !== index + 1 && "border-b"
+                } border-gray-300 flex flex-col md:flex-row md:items-center justify-between p-4 py-5 md:gap-16 w-full max-w-4xl`}
               key={index}
             >
               <div className="flex items-center mb-4 md:mb-0">
