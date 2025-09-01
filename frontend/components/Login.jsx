@@ -1,13 +1,15 @@
 import React from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [state, setState] = React.useState("login");
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const { setShowUserLogin, setUser, axios,navigate } = useAppContext();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
@@ -16,7 +18,7 @@ const Login = () => {
         state === "login" ? { email, password } : { email, name, password }
       );
       if (data.success) {
-        navigate('/')
+        navigate("/");
         setUser(data.user);
         toast.success(data.message);
         setShowUserLogin(false);
@@ -64,20 +66,48 @@ const Login = () => {
             placeholder="Enter your email"
             className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
             type="email"
-            required
           />
         </div>
         <div className="w-full ">
-          <p>Password</p>
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            placeholder="Enter your password"
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-            type="password"
-            required
-          />
+          <p className="mb-1">Password</p>
+          <div className="relative">
+            <input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              placeholder="Enter your password"
+              className="border border-gray-200 rounded w-full p-2 outline-primary"
+              type={showPassword ? "text" : "password"}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="cursor-pointer absolute right-3 top-3 my-auto scale-125"
+            >
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </button>
+          </div>
         </div>
+        {state === "register" && (
+          <div className="w-full ">
+          <p className="mb-1">Confirm Password</p>
+          <div className="relative">
+            <input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              placeholder="Enter your password"
+              className="border border-gray-200 rounded w-full p-2 outline-primary"
+              type={showPassword ? "text" : "password"}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="cursor-pointer absolute right-3 top-3 my-auto scale-125"
+            >
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </button>
+          </div>
+        </div>
+        )}
         {state === "register" ? (
           <p>
             Already have account?{" "}

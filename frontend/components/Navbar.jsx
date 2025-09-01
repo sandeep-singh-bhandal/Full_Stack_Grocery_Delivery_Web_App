@@ -13,7 +13,7 @@ const Navbar = () => {
     searchQuery,
     setSearchQuery,
     getCartItemCount,
-    axios
+    axios,
   } = useAppContext();
 
   const logout = async () => {
@@ -21,13 +21,25 @@ const Navbar = () => {
       const { data } = await axios.get("/api/user/logout");
       if (data.success) {
         toast.success(data.message);
-        navigate('/')
-        setUser(null)
+        navigate("/");
+        setUser(null);
       } else {
         toast.error(data.message);
       }
     } catch (err) {
       toast.error(err.message);
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      const { data } = await axios.delete("/api/user/delete");
+      if (data.success) {
+        toast.success(data.message);
+        setUser(null)
+      }
+    } catch (error) {
+      toast.success(error.message);
     }
   };
 
@@ -47,7 +59,6 @@ const Navbar = () => {
       <div className="hidden sm:flex items-center gap-8">
         <NavLink to="/">Home</NavLink>
         <NavLink to="/products">Products</NavLink>
-        <NavLink to="/contact">Contact</NavLink>
 
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
           <input
@@ -83,7 +94,7 @@ const Navbar = () => {
         ) : (
           <div className="relative group cursor-pointer">
             <img src={assets.profile_icon} alt="profile" className="w-10" />
-            <ul className="hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200 py-2.5 w-30 rounded-md text-sm z-40">
+            <ul className="hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200 py-2.5 w-36 rounded-md text-sm z-40">
               <li
                 className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
                 onClick={() => navigate("/my-orders")}
@@ -95,6 +106,12 @@ const Navbar = () => {
                 onClick={logout}
               >
                 Logout
+              </li>
+              <li
+                className="p-1.5 pl-3 text-red-400 hover:bg-primary/10 cursor-pointer"
+                onClick={deleteAccount}
+              >
+                Delete Account
               </li>
             </ul>
           </div>
@@ -115,10 +132,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        <button
-          onClick={() => setOpen(!open)}
-          aria-label="Menu"
-        >
+        <button onClick={() => setOpen(!open)} aria-label="Menu">
           {/* Menu Icon SVG */}
           <img src={assets.menu_icon} alt="menu" />
         </button>

@@ -35,7 +35,7 @@ export const register = async (req, res) => {
     });
     return res.json({
       success: true,
-      message: "User Successfully Created",
+      message: "Account Successfully Created",
       user: { email: user.email, name: user.name },
     });
   } catch (err) {
@@ -57,7 +57,7 @@ export const login = async (req, res) => {
     if (!user)
       return res.json({
         success: false,
-        message: "Invalid Email and Password ",
+        message: "Incorrect Email and Password ",
       });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -65,7 +65,7 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.json({
         success: false,
-        message: "Invalid Email and Password ",
+        message: "Incorrect Email and Password ",
       });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
@@ -111,6 +111,23 @@ export const logout = async (req, res) => {
     });
     return res.json({ success: true, message: "Logged Out Successfully" });
   } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// Delete User - /api/user/delete
+export const deleteAccount = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    await UserModel.findByIdAndDelete(userId);
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+    return res.json({ success: true, message: "Account Deleted Successfully" });
+  } catch (error) {
     console.log(err.message);
     res.json({ success: false, message: err.message });
   }
