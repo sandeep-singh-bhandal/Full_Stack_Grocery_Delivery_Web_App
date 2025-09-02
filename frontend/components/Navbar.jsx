@@ -15,7 +15,8 @@ const Navbar = () => {
     setSearchQuery,
     getCartItemCount,
     axios,
-    setShowModal
+    showDeleteAccountModal,
+    setShowDeleteAccountModal
   } = useAppContext();
 
   const logout = async () => {
@@ -102,7 +103,7 @@ const Navbar = () => {
               <li
                 className="p-1.5 pl-3 text-red-400 hover:bg-primary/10 cursor-pointer"
                 onClick={() => {
-                  setShowModal(true);
+                  setShowDeleteAccountModal(true);
                 }}
               >
                 Delete Account

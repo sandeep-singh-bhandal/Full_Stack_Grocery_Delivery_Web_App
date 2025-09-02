@@ -1,8 +1,8 @@
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 
-export default function Modal() {
-  const { setShowModal, axios, setUser } = useAppContext();
+export default function DeleteAccountModal() {
+  const { setShowDeleteAccountModal, axios, setUser } = useAppContext();
 
   const deleteAccount = async () => {
     try {
@@ -10,7 +10,7 @@ export default function Modal() {
       if (data.success) {
         toast.success(data.message);
         setUser(null);
-        setShowModal(false);
+        setShowDeleteAccountModal(false);
       }
     } catch (error) {
       toast.success(error.message);
@@ -40,13 +40,11 @@ export default function Modal() {
           Are you sure?
         </h2>
         <p className="text-sm text-gray-600 mt-2 text-center">
-          Do you really want to continue? This action
-          <br />
-          cannot be undone.
+          Do you really want to delete your account?
         </p>
         <div className="flex items-center justify-center gap-4 mt-5 w-full">
           <button
-            onClick={() => setShowModal(false)}
+            onClick={() => setShowDeleteAccountModal(false)}
             type="button"
             className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 font-medium text-sm hover:bg-gray-100 active:scale-95 transition cursor-pointer"
           >

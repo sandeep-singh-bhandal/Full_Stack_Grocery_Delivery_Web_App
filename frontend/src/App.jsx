@@ -17,14 +17,14 @@ import SellerLayout from "../pages/Seller/SellerLayout";
 import AddProduct from "../pages/Seller/AddProduct";
 import ProductList from "../pages/Seller/ProductList";
 import Orders from "../pages/Seller/Orders";
-import Modal from "../components/Modal";
+import DeleteAccountModal from "../components/DeleteAccountModal";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
-  const { showUserLogin, isSeller, showModal } = useAppContext();
+  const { showUserLogin, isSeller, showDeleteAccountModal } = useAppContext();
 
   useEffect(() => {
-    if (showModal) {
+    if (showDeleteAccountModal) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
@@ -33,12 +33,12 @@ const App = () => {
     return () => {
       document.body.classList.remove("overflow-hidden");
     };
-  }, [showModal]);
+  }, [showDeleteAccountModal]);
 
   return (
     <div
       className={`${
-        showModal
+        showDeleteAccountModal
           ? "overflow-y-hidden"
           : "text-default min-h-screen text-gray-700 bg-white"
       }`}
@@ -49,7 +49,7 @@ const App = () => {
       <div className="z-10">
         <Toaster />
       </div>
-      {showModal && <Modal />}
+      {showDeleteAccountModal && <DeleteAccountModal />}
       <div
         className={` ${isSellerPath ? "" : "px-6 md:px-16 lg:px-24 xl:px-32"}`}
       >
