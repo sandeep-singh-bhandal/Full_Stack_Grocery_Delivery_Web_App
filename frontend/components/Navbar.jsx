@@ -5,6 +5,7 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
+  
   const {
     user,
     setUser,
@@ -14,6 +15,7 @@ const Navbar = () => {
     setSearchQuery,
     getCartItemCount,
     axios,
+    setShowModal
   } = useAppContext();
 
   const logout = async () => {
@@ -31,17 +33,7 @@ const Navbar = () => {
     }
   };
 
-  const deleteAccount = async () => {
-    try {
-      const { data } = await axios.delete("/api/user/delete");
-      if (data.success) {
-        toast.success(data.message);
-        setUser(null)
-      }
-    } catch (error) {
-      toast.success(error.message);
-    }
-  };
+  
 
   useEffect(() => {
     if (searchQuery.length > 0) {
@@ -50,7 +42,7 @@ const Navbar = () => {
   }, [searchQuery]);
 
   return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
+    <nav className="flex items-center z-2 justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
       <NavLink to="/" onClick={() => setOpen(false)}>
         <img src={assets.logo} alt="logo" className="h-9" />
       </NavLink>
@@ -109,7 +101,9 @@ const Navbar = () => {
               </li>
               <li
                 className="p-1.5 pl-3 text-red-400 hover:bg-primary/10 cursor-pointer"
-                onClick={deleteAccount}
+                onClick={() => {
+                  setShowModal(true);
+                }}
               >
                 Delete Account
               </li>

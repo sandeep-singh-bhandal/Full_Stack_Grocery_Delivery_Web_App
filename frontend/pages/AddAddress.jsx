@@ -55,11 +55,18 @@ const AddAddress = () => {
   };
 
   return (
-    <div className="mt-16 pb-16">
+    <div className="mt-10 pb-16">
+      <button
+        onClick={() => navigate("/cart")}
+        className="group mb-6 flex scale-125 gap-1.5 cursor-pointer hover:-translate-x-1.5 transition-transform duration-150"
+      >
+        <img src={assets.arrow_right_icon_colored} alt="back" />
+        Go Back
+      </button>
       <p className="text-2xl md:text-3xl text-gray-500">
         Add Shipping <span className="font-semibold text-primary">Address</span>{" "}
       </p>
-      <div className="flex flex-col-reverse md:flex-row justify-between mt-10">
+      <div className="flex flex-col-reverse md:flex-row justify-between mt-5">
         <div className="flex-1 max-w-md">
           <form onSubmit={onSubmitHandler} className="space-y-3 mt-6 text-sm">
             <div className="grid grid-cols-2 gap-4">

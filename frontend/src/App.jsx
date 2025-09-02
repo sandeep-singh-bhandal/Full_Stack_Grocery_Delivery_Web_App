@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Home from "../pages/Home";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -17,16 +17,39 @@ import SellerLayout from "../pages/Seller/SellerLayout";
 import AddProduct from "../pages/Seller/AddProduct";
 import ProductList from "../pages/Seller/ProductList";
 import Orders from "../pages/Seller/Orders";
+import Modal from "../components/Modal";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
-  const { showUserLogin, isSeller } = useAppContext();
+  const { showUserLogin, isSeller, showModal } = useAppContext();
+
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [showModal]);
+
   return (
-    <div className="text-default min-h-screen text-gray-700 bg-white">
+    <div
+      className={`${
+        showModal
+          ? "overflow-y-hidden"
+          : "text-default min-h-screen text-gray-700 bg-white"
+      }`}
+    >
       {isSellerPath ? null : <Navbar />}
       {showUserLogin && <Login />}
 
-      <Toaster />
+      <div className="z-10">
+        <Toaster />
+      </div>
+      {showModal && <Modal />}
       <div
         className={` ${isSellerPath ? "" : "px-6 md:px-16 lg:px-24 xl:px-32"}`}
       >

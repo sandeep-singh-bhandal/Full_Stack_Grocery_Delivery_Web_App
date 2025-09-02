@@ -18,6 +18,7 @@ export const AppContextProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   //Fetch Seller Status
   const fetchSeller = async () => {
@@ -142,6 +143,8 @@ export const AppContextProvider = ({ children }) => {
     getCartItemCount,
     getCartAmount,
     fetchProducts,
+    showModal,
+    setShowModal
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

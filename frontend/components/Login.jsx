@@ -8,14 +8,18 @@ const Login = () => {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
       const { data } = await axios.post(
         `/api/user/${state}`,
-        state === "login" ? { email, password } : { email, name, password }
+        state === "login"
+          ? { email, password }
+          : { email, name, password, confirmPassword }
       );
       if (data.success) {
         navigate("/");
@@ -23,7 +27,11 @@ const Login = () => {
         toast.success(data.message);
         setShowUserLogin(false);
       } else {
-        toast.error(data.message);
+        if (data.message) {
+          toast.error(data.message);
+        } else {
+          toast.error(data.errors[0].message);
+        }
         setShowUserLogin(true);
       }
     } catch (error) {
@@ -54,7 +62,6 @@ const Login = () => {
               placeholder="Enter your name"
               className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
               type="text"
-              required
             />
           </div>
         )}
@@ -65,7 +72,6 @@ const Login = () => {
             value={email}
             placeholder="Enter your email"
             className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-            type="email"
           />
         </div>
         <div className="w-full ">
@@ -89,24 +95,24 @@ const Login = () => {
         </div>
         {state === "register" && (
           <div className="w-full ">
-          <p className="mb-1">Confirm Password</p>
-          <div className="relative">
-            <input
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              placeholder="Enter your password"
-              className="border border-gray-200 rounded w-full p-2 outline-primary"
-              type={showPassword ? "text" : "password"}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="cursor-pointer absolute right-3 top-3 my-auto scale-125"
-            >
-              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
-            </button>
+            <p className="mb-1">Confirm Password</p>
+            <div className="relative">
+              <input
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={confirmPassword}
+                placeholder="Enter your password"
+                className="border border-gray-200 rounded w-full p-2 outline-primary"
+                type={showConfirmPassword ? "text" : "password"}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="cursor-pointer absolute right-3 top-3 my-auto scale-125"
+              >
+                {showConfirmPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              </button>
+            </div>
           </div>
-        </div>
         )}
         {state === "register" ? (
           <p>
