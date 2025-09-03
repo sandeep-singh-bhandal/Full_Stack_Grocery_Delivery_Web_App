@@ -3,8 +3,10 @@ import { useAppContext } from "../../context/AppContext";
 import { MdEdit, MdDelete } from "react-icons/md";
 import DeleteProductModal from "../../components/seller/DeleteProductModal";
 import EditProductModal from "../../components/seller/EditProductModal";
+import { useState } from "react";
 
 const ProductList = () => {
+  const [clickedProduct, setClickedProduct] = useState("");
   const icons = [
     {
       name: "Edit",
@@ -38,10 +40,11 @@ const ProductList = () => {
       toast.error(error.message);
     }
   };
+  
   return (
     <div className="no-scrollbar flex-1 overflow-y-scroll flex flex-col justify-between relative">
-      {showProductDeleteModal && <DeleteProductModal />}
-      {showEditProductModal && <EditProductModal />}
+      {showProductDeleteModal && <DeleteProductModal id={clickedProduct._id} imagesData={clickedProduct.imagesData} />}
+      {showEditProductModal && <EditProductModal product={clickedProduct} />}
       <div className="w-full md:p-10 p-4">
         <h2 className="pb-4 text-lg font-medium">All Products</h2>
         <div className="flex flex-col items-center max-w-5xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
@@ -64,7 +67,7 @@ const ProductList = () => {
                   <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center space-x-3 truncate">
                     <div className="border border-gray-300 rounded overflow-hidden">
                       <img
-                        src={product.image[0]}
+                        src={product.imagesData[0].url}
                         alt="Product"
                         className="w-16"
                       />
@@ -96,9 +99,12 @@ const ProductList = () => {
                     <td className="px-4 py-3" key={i}>
                       <button
                         onClick={() => {
-                          icon.name === "Delete"
-                            ? setShowProductDeleteModal(true)
-                            : setShowEditProductModal(true);
+                          if (icon.name === "Delete") {
+                            setShowProductDeleteModal(true);
+                          } else {
+                            setShowEditProductModal(true);
+                          }
+                          setClickedProduct(product);
                         }}
                         type="button"
                         className={`${

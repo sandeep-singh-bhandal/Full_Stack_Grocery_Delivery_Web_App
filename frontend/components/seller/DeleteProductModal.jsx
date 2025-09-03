@@ -1,7 +1,25 @@
+import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
 
-export default function DeleteProductModal() {
-  const { setShowProductDeleteModal } = useAppContext();
+export default function DeleteProductModal({ id, imagesData }) {
+  const { setShowProductDeleteModal, axios, fetchProducts } = useAppContext();
+
+  const deleteProduct = async (id) => {
+    try {
+      const loadingToast = toast.loading("Deleting Product...");
+      const { data } = await axios.post(`/api/product/delete/${id}`, {
+        imagesData,
+      });
+      toast.dismiss(loadingToast);
+      await fetchProducts();
+      if (data.success) {
+        toast.success(data.message);
+        setShowProductDeleteModal(false);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="w-full h-full bg-black/40 absolute z-1 flex justify-center items-center backdrop-blur-sm">
@@ -38,6 +56,7 @@ export default function DeleteProductModal() {
             Cancel
           </button>
           <button
+            onClick={() => deleteProduct(id)}
             type="button"
             className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium text-sm hover:bg-red-700 active:scale-95 transition cursor-pointer"
           >

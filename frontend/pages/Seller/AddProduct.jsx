@@ -10,7 +10,7 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
-  const { axios } = useAppContext();
+  const { axios, fetchProducts } = useAppContext();
 
   const onSubmitHandler = async (e) => {
     try {
@@ -29,7 +29,10 @@ const AddProduct = () => {
         formData.append("images", files[i]);
       }
 
+      const loadingToast = toast.loading("Adding Product...");
       const { data } = await axios.post("/api/product/add", formData);
+      toast.dismiss(loadingToast);
+      await fetchProducts();
       if (data.success) {
         toast.success(data.message);
         setName("");

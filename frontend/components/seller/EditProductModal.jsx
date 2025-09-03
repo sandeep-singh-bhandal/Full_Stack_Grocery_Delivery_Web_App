@@ -3,33 +3,46 @@ import { useAppContext } from "../../context/AppContext";
 import { useState } from "react";
 import { assets, categories } from "../../assets/assets";
 
-export default function EditProductModal() {
+export default function EditProductModal({ product }) {
   const { setShowEditProductModal, axios } = useAppContext();
-  const [files, setFiles] = useState([]);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [price, setPrice] = useState("");
-  const [offerPrice, setOfferPrice] = useState("");
-
+  const [updatedProductData, setUpdatedProductData] = useState({
+    name: product.name,
+    description: product.description,
+    category: product.category,
+    price: product.price,
+    offerPrice: product.offerPrice,
+    images: product.imagesData,
+  });
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setUpdatedProductData({ ...updatedProductData, [name]: value });
+  };
+  const onFileChangeHandler = (e, index) => {
+    const updatedFiles = [...updatedProductData.images];
+    updatedFiles[index] = e.target.files[0];
+    setUpdatedProductData({ ...updatedProductData, images: updatedFiles });
+  };
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
-      const productData = {
-        name,
-        description: description.split("\n"),
-        category,
-        price,
-        offerPrice,
-      };
-
       const formData = new FormData();
-      formData.append("productData", JSON.stringify(productData));
-      for (let i = 0; i < files.length; i++) {
-        formData.append("images", files[i]);
-      }
+      Object.entries(updatedProductData).forEach(([key, value]) => {
+        if (key === "files") {
+          for (let i = 0; i < value.length; i++) {
+            formData.append("files", value[i]);
+          }
+        } else {
+          formData.append(key, value);
+        }
+      });
 
-      const { data } = await axios.post("/api/product/add", formData);
+      const { data } = await axios.patch(
+        `/api/product/update/${product._id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       if (data.success) {
         toast.success(data.message);
         setName("");
@@ -51,7 +64,7 @@ export default function EditProductModal() {
       <div className="flex items-center bg-white shadow-md rounded-xl py-6 px-5 max-w-5xl max-h-10/12 border border-gray-200">
         <div className="no-scrollbar flex overflow-y-scroll justify-between">
           <form
-            onSubmit={onSubmitHandler}
+            onSubmit={(e) => onSubmitHandler(e, product._id)}
             className="md:p-10 p-4 space-y-5 max-w-full "
           >
             <div>
@@ -66,11 +79,7 @@ export default function EditProductModal() {
                       className="relative"
                     >
                       <input
-                        onChange={(e) => {
-                          const updatedFiles = [...files];
-                          updatedFiles[index] = e.target.files[0];
-                          setFiles(updatedFiles);
-                        }}
+                        onChange={(e) => onFileChangeHandler(e, index)}
                         accept="image/*"
                         type="file"
                         id={`image${index}`}
@@ -79,9 +88,16 @@ export default function EditProductModal() {
                       <img
                         className="max-w-24 cursor-pointer"
                         src={
-                          files[index]
-                            ? URL.createObjectURL(files[index])
-                            : assets.upload_area
+                          updatedProductData.images &&       
+                          updatedProductData.images[index]
+                            ? typeof updatedProductData.images[index].url ===
+                              "string"
+                              ? updatedProductData.images[index].url
+                              : URL.createObjectURL(
+                                  updatedProductData.images[index]
+                                )
+                            : 
+                            assets.upload_area
                         }
                         alt="uploadArea"
                         width={100}
@@ -91,9 +107,9 @@ export default function EditProductModal() {
                         type="button"
                         className="absolute -top-2 -right-2 cursor-pointer bg-white rounded-full active:translate-y-0.5 "
                         onClick={() => {
-                          const updatedFiles = [...files];
+                          const updatedFiles = [...updatedProductData.files];
                           updatedFiles.splice(index, 1);
-                          setFiles(updatedFiles);
+                          setUpdatedProductData({ files: updatedFiles });
                         }}
                       >
                         <img src={assets.remove_icon} alt="remove" />
@@ -109,9 +125,9 @@ export default function EditProductModal() {
                   Product Name
                 </label>
                 <input
-                  onChange={(e) => setName(e.target.value)}
-                  value={name}
-                  id="product-name"
+                  name="name"
+                  onChange={onChangeHandler}
+                  value={updatedProductData.name || ""}
                   type="text"
                   placeholder="Type here"
                   className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
@@ -126,9 +142,9 @@ export default function EditProductModal() {
                   Product Description
                 </label>
                 <textarea
-                  onChange={(e) => setDescription(e.target.value)}
-                  value={description}
-                  id="product-description"
+                  name="description"
+                  onChange={onChangeHandler}
+                  value={updatedProductData.description || ""}
                   rows={4}
                   className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 resize-none"
                   placeholder="Type here"
@@ -141,9 +157,9 @@ export default function EditProductModal() {
                   Category
                 </label>
                 <select
-                  onChange={(e) => setCategory(e.target.value)}
-                  value={category}
-                  id="category"
+                  onChange={onChangeHandler}
+                  value={updatedProductData.category || ""}
+                  name="category"
                   className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
                 >
                   <option value="">Select Category</option>
@@ -163,9 +179,9 @@ export default function EditProductModal() {
                     Product Price
                   </label>
                   <input
-                    onChange={(e) => setPrice(e.target.value)}
-                    value={price}
-                    id="product-price"
+                    onChange={onChangeHandler}
+                    value={updatedProductData.price || null}
+                    name="price"
                     type="number"
                     placeholder="0"
                     className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
@@ -180,9 +196,9 @@ export default function EditProductModal() {
                     Offer Price
                   </label>
                   <input
-                    onChange={(e) => setOfferPrice(e.target.value)}
-                    value={offerPrice}
-                    id="offer-price"
+                    onChange={onChangeHandler}
+                    value={updatedProductData.offerPrice || null}
+                    name="offerPrice"
                     type="number"
                     placeholder="0"
                     className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
@@ -193,10 +209,16 @@ export default function EditProductModal() {
             </div>
 
             <div className="flex gap-3">
-              <button className="px-8 py-2.5 bg-primary text-white font-medium rounded cursor-pointer hover:bg-primary-dull">
+              <button
+                type="submit"
+                className="px-8 py-2.5 bg-primary text-white font-medium rounded cursor-pointer hover:bg-primary-dull"
+              >
                 Save
               </button>
-              <button onClick={()=>setShowEditProductModal(false)} className="px-8 py-2.5 bg-red-500 text-white font-medium rounded cursor-pointer hover:bg-red-600">
+              <button
+                onClick={() => setShowEditProductModal(false)}
+                className="px-8 py-2.5 bg-red-500 text-white font-medium rounded cursor-pointer hover:bg-red-600"
+              >
                 Cancel
               </button>
             </div>
