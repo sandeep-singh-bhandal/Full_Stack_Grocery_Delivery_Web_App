@@ -60,10 +60,14 @@ export default function EditProductModal({ product }) {
   };
 
   return (
-    <div className="h-full w-full bg-black/40 absolute z-1 flex justify-center items-center backdrop-blur-sm">
+    <div
+      onClick={() => setShowEditProductModal(false)}
+      className="fixed inset-0 bg-black/40 z-1 flex justify-center items-center backdrop-blur-sm"
+    >
       <div className="flex items-center bg-white shadow-md rounded-xl py-6 px-5 max-w-5xl max-h-10/12 border border-gray-200">
         <div className="no-scrollbar flex overflow-y-scroll justify-between">
           <form
+            onClick={(e) => e.stopPropagation()}
             onSubmit={(e) => onSubmitHandler(e, product._id)}
             className="md:p-10 p-4 space-y-5 max-w-full "
           >
@@ -88,7 +92,7 @@ export default function EditProductModal({ product }) {
                       <img
                         className="max-w-24 cursor-pointer"
                         src={
-                          updatedProductData.images &&       
+                          updatedProductData.images &&
                           updatedProductData.images[index]
                             ? typeof updatedProductData.images[index].url ===
                               "string"
@@ -96,8 +100,7 @@ export default function EditProductModal({ product }) {
                               : URL.createObjectURL(
                                   updatedProductData.images[index]
                                 )
-                            : 
-                            assets.upload_area
+                            : assets.upload_area
                         }
                         alt="uploadArea"
                         width={100}

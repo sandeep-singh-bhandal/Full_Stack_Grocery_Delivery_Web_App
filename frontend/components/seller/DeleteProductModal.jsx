@@ -22,8 +22,8 @@ export default function DeleteProductModal({ id, imagesData }) {
   };
 
   return (
-    <div className="w-full h-full bg-black/40 absolute z-1 flex justify-center items-center backdrop-blur-sm">
-      <div className="flex flex-col items-center  bg-white shadow-md rounded-xl py-6 px-5 md:w-[460px] w-[370px] border border-gray-200">
+    <div onClick={()=>setShowProductDeleteModal(false)} className="fixed inset-0 bg-black/40 z-1 flex justify-center items-center backdrop-blur-sm">
+      <div onClick={(e)=>e.stopPropagation()} className="flex flex-col items-center  bg-white shadow-md rounded-xl py-6 px-5 md:w-[460px] w-[370px] border border-gray-200">
         <div className="flex items-center justify-center p-4 bg-red-100 rounded-full">
           <svg
             width="24"
