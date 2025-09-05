@@ -28,8 +28,8 @@ const AddProduct = () => {
       for (let i = 0; i < files.length; i++) {
         formData.append("images", files[i]);
       }
-
-      const loadingToast = toast.loading("Adding Product...");
+      
+      const loadingToast =toast.loading("Adding Product...");
       const { data } = await axios.post("/api/product/add", formData);
       toast.dismiss(loadingToast);
       await fetchProducts();
@@ -114,7 +114,7 @@ const AddProduct = () => {
             type="text"
             placeholder="Type here"
             className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-            required
+            
           />
         </div>
         <div className="flex flex-col gap-1 max-w-md">
@@ -163,7 +163,7 @@ const AddProduct = () => {
               type="number"
               placeholder="0"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              required
+              
             />
           </div>
           <div className="flex-1 flex flex-col gap-1 w-32">
@@ -177,7 +177,7 @@ const AddProduct = () => {
               type="number"
               placeholder="0"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              required
+              
             />
           </div>
         </div>

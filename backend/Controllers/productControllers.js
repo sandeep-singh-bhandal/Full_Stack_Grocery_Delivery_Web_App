@@ -6,6 +6,37 @@ export const addProduct = async (req, res) => {
   try {
     let productData = JSON.parse(req.body.productData);
 
+    if (!productData.name) {
+      return res.json({ success: false, message: "Please provide the name" });
+    }
+    if (productData.description.every((el) => el === "")) {
+      return res.json({
+        success: false,
+        message: "Please provide a description",
+      });
+    }
+    if (!productData.category) {
+      return res.json({
+        success: false,
+        message: "Please provide the category",
+      });
+    }
+    if (!productData.price) {
+      return res.json({ success: false, message: "Please provide the price" });
+    }
+    if (!productData.offerPrice) {
+      return res.json({
+        success: false,
+        message: "Please provide the Offer Price",
+      });
+    }
+    if (req.files.length===0) {
+      return res.json({
+        success: false,
+        message: "Please provide an Image",
+      });
+    }
+
     const images = req.files;
 
     let imagesData = await Promise.all(
