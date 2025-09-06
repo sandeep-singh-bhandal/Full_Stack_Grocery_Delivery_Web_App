@@ -9,14 +9,26 @@ import {
 } from "../Controllers/productControllers.js";
 import { upload } from "../Config/multer.js";
 import { authSeller } from "../Middlewares/authSeller.js";
+import { productValidator } from "../Middlewares/productValidation.js";
 
 const productRouter = Router();
 
-productRouter.post("/add", upload.array(["images"], 5), authSeller, addProduct);
+productRouter.post(
+  "/add",
+  upload.array(["files"], 5),
+  productValidator,
+  authSeller,
+  addProduct
+);
 productRouter.get("/list", getProduct);
 productRouter.get("/id/:id", getProductById);
 productRouter.post("/delete/:id", deleteProduct);
 productRouter.post("/stock", changeStock);
-productRouter.patch("/update/:id", upload.array(["files"], 5), updateProduct);
+productRouter.put(
+  "/update/:id",
+  upload.array(["files"], 5),
+  productValidator,
+  updateProduct
+);
 
 export default productRouter;

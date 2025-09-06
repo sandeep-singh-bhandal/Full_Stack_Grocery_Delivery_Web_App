@@ -14,10 +14,16 @@ export default function EditProductModal({ product }) {
     offerPrice: product.offerPrice,
     imagesData: product.imagesData,
   });
-
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
-    setUpdatedProductData({ ...updatedProductData, [name]: value });
+    if (name === "description") {
+      setUpdatedProductData({
+        ...updatedProductData,
+        description: value.split("\n"),
+      });
+    } else {
+      setUpdatedProductData({ ...updatedProductData, [name]: value });
+    }
   };
   const onFileChangeHandler = (e, index) => {
     const updatedFiles = [...updatedProductData.imagesData];
@@ -39,11 +45,15 @@ export default function EditProductModal({ product }) {
             }
           });
         } else {
-          formData.append(key, value);
+          if (key === "description") {
+            formData.append("description", JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
         }
       });
       const loadingToast = toast.loading("Updating Product...");
-      const { data } = await axios.patch(
+      const { data } = await axios.put(
         `/api/product/update/${product._id}`,
         formData,
         {
@@ -143,7 +153,6 @@ export default function EditProductModal({ product }) {
                   type="text"
                   placeholder="Type here"
                   className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-                  required
                 />
               </div>
               <div className="flex flex-col gap-1 w-3xl">
@@ -156,7 +165,11 @@ export default function EditProductModal({ product }) {
                 <textarea
                   name="description"
                   onChange={onChangeHandler}
-                  value={updatedProductData.description || ""}
+                  value={
+                    Array.isArray(updatedProductData.description)
+                      ? updatedProductData.description.join("\n")
+                      : updatedProductData.description || ""
+                  }
                   rows={4}
                   className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 resize-none"
                   placeholder="Type here"
@@ -197,7 +210,6 @@ export default function EditProductModal({ product }) {
                     type="number"
                     placeholder="0"
                     className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-                    required
                   />
                 </div>
                 <div className="flex-1 flex flex-col gap-1 w-32">
@@ -214,7 +226,6 @@ export default function EditProductModal({ product }) {
                     type="number"
                     placeholder="0"
                     className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-                    required
                   />
                 </div>
               </div>

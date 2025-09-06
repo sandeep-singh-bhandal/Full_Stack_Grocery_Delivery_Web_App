@@ -4,43 +4,43 @@ import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 
 const AddProduct = () => {
-  const [files, setFiles] = useState([]);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [price, setPrice] = useState("");
-  const [offerPrice, setOfferPrice] = useState("");
+  const [productData, setProductData] = useState({
+    name: "",
+    description: "",
+    category: "",
+    price: "",
+    offerPrice: "",
+  });
+
+  const [images, setImages] = useState([]);
+
   const { axios, fetchProducts } = useAppContext();
 
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
-      const productData = {
-        name,
-        description: description.split("\n"),
-        category,
-        price,
-        offerPrice,
-      };
-
       const formData = new FormData();
-      formData.append("productData", JSON.stringify(productData));
-      for (let i = 0; i < files.length; i++) {
-        formData.append("images", files[i]);
-      }
-      
-      const loadingToast =toast.loading("Adding Product...");
+      Object.entries(productData).map(([key, value]) => {
+        if (key === "description") {
+          formData.append("description", JSON.stringify(value.split("\n")));
+        } else formData.append(key, value);
+      });
+      images.forEach((item) => formData.append("files", item));
+
+      const loadingToast = toast.loading("Adding Product...");
       const { data } = await axios.post("/api/product/add", formData);
       toast.dismiss(loadingToast);
       await fetchProducts();
       if (data.success) {
         toast.success(data.message);
-        setName("");
-        setDescription("");
-        setPrice("");
-        setCategory("");
-        setOfferPrice("");
-        setFiles([]);
+        setProductData({
+          name: "",
+          description: "",
+          category: "",
+          price: "",
+          offerPrice: "",
+        });
+        setImages([]);
       } else {
         toast.error(data.message);
       }
@@ -68,9 +68,9 @@ const AddProduct = () => {
                 >
                   <input
                     onChange={(e) => {
-                      const updatedFiles = [...files];
-                      updatedFiles[index] = e.target.files[0];
-                      setFiles(updatedFiles);
+                      const updatedImages = [...images];
+                      updatedImages[index] = e.target.files[0];
+                      setImages(updatedImages);
                     }}
                     accept="image/*"
                     type="file"
@@ -80,8 +80,8 @@ const AddProduct = () => {
                   <img
                     className="max-w-24 cursor-pointer"
                     src={
-                      files[index]
-                        ? URL.createObjectURL(files[index])
+                      images[index]
+                        ? URL.createObjectURL(images[index])
                         : assets.upload_area
                     }
                     alt="uploadArea"
@@ -92,9 +92,9 @@ const AddProduct = () => {
                     type="button"
                     className="absolute -top-2 -right-2 cursor-pointer bg-white rounded-full active:translate-y-0.5 "
                     onClick={() => {
-                      const updatedFiles = [...files];
-                      updatedFiles.splice(index, 1);
-                      setFiles(updatedFiles);
+                      const updatedImages = [...images];
+                      updatedImages.splice(index, 1);
+                      setImages(updatedImages);
                     }}
                   >
                     <img src={assets.remove_icon} alt="remove" />
@@ -108,13 +108,14 @@ const AddProduct = () => {
             Product Name
           </label>
           <input
-            onChange={(e) => setName(e.target.value)}
-            value={name}
+            onChange={(e) =>
+              setProductData({ ...productData, name: e.target.value })
+            }
+            value={productData.name}
             id="product-name"
             type="text"
             placeholder="Type here"
             className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-            
           />
         </div>
         <div className="flex flex-col gap-1 max-w-md">
@@ -125,8 +126,13 @@ const AddProduct = () => {
             Product Description
           </label>
           <textarea
-            onChange={(e) => setDescription(e.target.value)}
-            value={description}
+            onChange={(e) =>
+              setProductData({
+                ...productData,
+                description: e.target.value,
+              })
+            }
+            value={productData.description}
             id="product-description"
             rows={4}
             className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 resize-none"
@@ -138,8 +144,10 @@ const AddProduct = () => {
             Category
           </label>
           <select
-            onChange={(e) => setCategory(e.target.value)}
-            value={category}
+            onChange={(e) =>
+              setProductData({ ...productData, category: e.target.value })
+            }
+            value={productData.category}
             id="category"
             className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
           >
@@ -157,13 +165,14 @@ const AddProduct = () => {
               Product Price
             </label>
             <input
-              onChange={(e) => setPrice(e.target.value)}
-              value={price}
+              onChange={(e) =>
+                setProductData({ ...productData, price: e.target.value })
+              }
+              value={productData.price}
               id="product-price"
               type="number"
               placeholder="0"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              
             />
           </div>
           <div className="flex-1 flex flex-col gap-1 w-32">
@@ -171,13 +180,14 @@ const AddProduct = () => {
               Offer Price
             </label>
             <input
-              onChange={(e) => setOfferPrice(e.target.value)}
-              value={offerPrice}
+              onChange={(e) =>
+                setProductData({ ...productData, offerPrice: e.target.value })
+              }
+              value={productData.offerPrice}
               id="offer-price"
               type="number"
               placeholder="0"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              
             />
           </div>
         </div>
