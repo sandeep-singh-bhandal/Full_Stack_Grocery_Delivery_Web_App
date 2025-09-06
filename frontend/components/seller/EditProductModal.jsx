@@ -4,38 +4,45 @@ import { useState } from "react";
 import { assets, categories } from "../../assets/assets";
 
 export default function EditProductModal({ product }) {
-  const { setShowEditProductModal, axios } = useAppContext();
+  const { setShowEditProductModal, axios, fetchProducts } = useAppContext();
   const [updatedProductData, setUpdatedProductData] = useState({
+    id: product._id,
     name: product.name,
     description: product.description,
     category: product.category,
     price: product.price,
     offerPrice: product.offerPrice,
-    images: product.imagesData,
+    imagesData: product.imagesData,
   });
+
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setUpdatedProductData({ ...updatedProductData, [name]: value });
   };
   const onFileChangeHandler = (e, index) => {
-    const updatedFiles = [...updatedProductData.images];
+    const updatedFiles = [...updatedProductData.imagesData];
     updatedFiles[index] = e.target.files[0];
-    setUpdatedProductData({ ...updatedProductData, images: updatedFiles });
+    setUpdatedProductData({ ...updatedProductData, imagesData: updatedFiles });
   };
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
       const formData = new FormData();
+
       Object.entries(updatedProductData).forEach(([key, value]) => {
-        if (key === "files") {
-          for (let i = 0; i < value.length; i++) {
-            formData.append("files", value[i]);
-          }
+        if (key === "imagesData") {
+          value.forEach((item, index) => {
+            if (item instanceof File) {
+              formData.append("files", item);
+            } else {
+              formData.append("existingImagesData", JSON.stringify(item));
+            }
+          });
         } else {
           formData.append(key, value);
         }
       });
-
+      const loadingToast = toast.loading("Updating Product...");
       const { data } = await axios.patch(
         `/api/product/update/${product._id}`,
         formData,
@@ -43,14 +50,11 @@ export default function EditProductModal({ product }) {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
+      toast.dismiss(loadingToast);
       if (data.success) {
         toast.success(data.message);
-        setName("");
-        setDescription("");
-        setPrice("");
-        setCategory("");
-        setOfferPrice("");
-        setFiles([]);
+        fetchProducts();
+        setShowEditProductModal(false);
       } else {
         toast.error(data.message);
       }
@@ -92,13 +96,13 @@ export default function EditProductModal({ product }) {
                       <img
                         className="max-w-24 cursor-pointer"
                         src={
-                          updatedProductData.images &&
-                          updatedProductData.images[index]
-                            ? typeof updatedProductData.images[index].url ===
-                              "string"
-                              ? updatedProductData.images[index].url
+                          updatedProductData.imagesData &&
+                          updatedProductData.imagesData[index]
+                            ? typeof updatedProductData.imagesData[index]
+                                .url === "string"
+                              ? updatedProductData.imagesData[index].url
                               : URL.createObjectURL(
-                                  updatedProductData.images[index]
+                                  updatedProductData.imagesData[index]
                                 )
                             : assets.upload_area
                         }
@@ -110,9 +114,14 @@ export default function EditProductModal({ product }) {
                         type="button"
                         className="absolute -top-2 -right-2 cursor-pointer bg-white rounded-full active:translate-y-0.5 "
                         onClick={() => {
-                          const updatedFiles = [...updatedProductData.files];
+                          const updatedFiles = [
+                            ...updatedProductData.imagesData,
+                          ];
                           updatedFiles.splice(index, 1);
-                          setUpdatedProductData({ files: updatedFiles });
+                          setUpdatedProductData({
+                            ...updatedProductData,
+                            imagesData: updatedFiles,
+                          });
                         }}
                       >
                         <img src={assets.remove_icon} alt="remove" />

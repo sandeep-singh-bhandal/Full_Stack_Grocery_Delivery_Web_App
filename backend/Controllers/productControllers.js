@@ -30,7 +30,7 @@ export const addProduct = async (req, res) => {
         message: "Please provide the Offer Price",
       });
     }
-    if (req.files.length===0) {
+    if (req.files.length === 0) {
       return res.json({
         success: false,
         message: "Please provide an Image",
@@ -104,16 +104,90 @@ export const getProductById = async (req, res) => {
 };
 //Update Product - api/product/update
 export const updateProduct = async (req, res) => {
-  console.log(req.files);
+  try {
+    let {
+      id,
+      name,
+      description,
+      category,
+      price,
+      offerPrice,
+      existingImagesData,
+    } = req.body;
 
-  // try {
-  //   const { updatedProductData } = req.body;
-  //   await ProductModel.findByIdAndUpdate(id, { updatedProductData });
-  //   res.json({ success: true, message: "Product Updated" });
-  // } catch (err) {
-  //   console.log(err.message);
-  //   res.json({ success: false, message: err.message });
-  // }
+    // converting existingImagesData to array if only single images is received
+    if (!Array.isArray(existingImagesData) && existingImagesData) {
+      existingImagesData = [existingImagesData];
+    }
+
+    // parse incoming strings into objects
+    let parsedExistingImagesData;
+    if (existingImagesData) {
+      parsedExistingImagesData = existingImagesData.map((item) =>
+        JSON.parse(item)
+      );
+    }
+
+    // fetch product
+    const productDetails = await ProductModel.findById(id);
+    if (!existingImagesData) {
+      await Promise.all(
+        productDetails.imagesData.map((item) =>
+          cloudinary.uploader.destroy(item.publicId)
+        )
+      );
+    } else {
+      // ---------------- Step 1: Find & delete removed images ----------------
+      const removedFromFrontend = productDetails.imagesData.filter(
+        (dbItem) =>
+          !parsedExistingImagesData.some(
+            (frontItem) => frontItem.publicId === dbItem.publicId
+          )
+      );
+
+      await Promise.all(
+        removedFromFrontend.map((item) =>
+          cloudinary.uploader.destroy(item.publicId)
+        )
+      );
+    }
+
+    // ---------------- Step 2: Upload new images ----------------
+    const newImages = req.files || [];
+
+    const uploadedImagesData = await Promise.all(
+      newImages.map(async (image) => {
+        const result = await cloudinary.uploader.upload(image.path, {
+          resource_type: "image",
+        });
+        return { url: result.secure_url, publicId: result.public_id };
+      })
+    );
+
+    // merge with newly uploaded
+    const finalImages = existingImagesData
+      ? [...parsedExistingImagesData, ...uploadedImagesData]
+      : [...uploadedImagesData];
+
+    // ---------------- Step 4: Update DB ----------------
+    await ProductModel.findByIdAndUpdate(
+      id,
+      {
+        name,
+        description,
+        category,
+        price,
+        offerPrice,
+        imagesData: finalImages,
+      },
+      { new: true }
+    );
+
+    res.json({ success: true, message: "Product Updated" });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 //Change Product inStock - api/product/stock

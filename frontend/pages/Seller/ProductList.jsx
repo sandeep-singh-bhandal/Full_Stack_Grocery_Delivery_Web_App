@@ -67,7 +67,7 @@ const ProductList = () => {
                   <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center space-x-3 truncate">
                     <div className="border border-gray-300 rounded overflow-hidden">
                       <img
-                        // src={product.imagesData[0].url}
+                        src={product.imagesData[0].url}
                         alt="Product"
                         className="w-16"
                       />
