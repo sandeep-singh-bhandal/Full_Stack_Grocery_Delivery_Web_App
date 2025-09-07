@@ -1,6 +1,7 @@
 import UserModel from "../Models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import AddressModel from "../Models/Address.js";
 
 //Registering User - /api/user/register
 export const register = async (req, res) => {
@@ -123,6 +124,19 @@ export const deleteAccount = async (req, res) => {
     });
     return res.json({ success: true, message: "Account Deleted Successfully" });
   } catch (error) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+export const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const user = await UserModel.findById(userId);
+    const userAddresses = await AddressModel.find({ userId });
+    const userDetails = [user,userAddresses];
+    res.json({ success: true, user: userDetails });
+  } catch (err) {
     console.log(err.message);
     res.json({ success: false, message: err.message });
   }

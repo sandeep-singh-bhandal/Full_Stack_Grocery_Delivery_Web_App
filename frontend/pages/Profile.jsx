@@ -1,45 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { MdEmail, MdLocalPhone, MdLocationOn } from "react-icons/md";
+import { useAppContext } from "../context/AppContext";
 
 const Profile = () => {
+  const { axios, navigate } = useAppContext();
+  const [userDetails, setUserDetails] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
   const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    bio: "Software Developer passionate about creating amazing user experiences.",
-    addresses: [
-      {
-        id: 1,
-        type: "Home",
-        street: "123 Main Street",
-        city: "New York",
-        state: "NY",
-        zipCode: "10001",
-        isDefault: true,
-      },
-      {
-        id: 2,
-        type: "Work",
-        street: "456 Business Ave",
-        city: "New York",
-        state: "NY",
-        zipCode: "10002",
-        isDefault: false,
-      },
-    ],
+    name: "",
+    email: "",
+    phone: "",
+    addresses: [],
   });
 
-  const [newAddress, setNewAddress] = useState({
-    type: "Home",
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
-  });
+  const getUser = async () => {
+    const { data } = await axios.get("/api/user/get-user");
+    try {
+      if (data.success) {
+        const { name, email, phone } = data.user[0];
+        setFormData((prev) => ({
+          ...prev,
+          name,
+          email,
+          phone,
+          addresses: data.user[1],
+        }));
+        setUserDetails(data.user[0]);
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
-  const [showAddAddress, setShowAddAddress] = useState(false);
+  useEffect(() => {
+    getUser();
+  }, []);
+  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -52,7 +52,7 @@ const Profile = () => {
     setFormData((prev) => ({
       ...prev,
       addresses: prev.addresses.map((addr) =>
-        addr.id === id ? { ...addr, [field]: value } : addr
+        addr._id === id ? { ...addr, [field]: value } : addr
       ),
     }));
   };
@@ -62,41 +62,14 @@ const Profile = () => {
       ...prev,
       addresses: prev.addresses.map((addr) => ({
         ...addr,
-        isDefault: addr.id === id,
+        isDefault: addr._id === id,
       })),
     }));
   };
-
-  const handleAddNewAddress = () => {
-    if (
-      newAddress.street &&
-      newAddress.city &&
-      newAddress.state &&
-      newAddress.zipCode
-    ) {
-      const newId = Math.max(...formData.addresses.map((a) => a.id)) + 1;
-      setFormData((prev) => ({
-        ...prev,
-        addresses: [
-          ...prev.addresses,
-          { ...newAddress, id: newId, isDefault: false },
-        ],
-      }));
-      setNewAddress({
-        type: "Home",
-        street: "",
-        city: "",
-        state: "",
-        zipCode: "",
-      });
-      setShowAddAddress(false);
-    }
-  };
-
   const handleRemoveAddress = (id) => {
     setFormData((prev) => ({
       ...prev,
-      addresses: prev.addresses.filter((addr) => addr.id !== id),
+      addresses: prev.addresses.filter((addr) => addr._id !== id),
     }));
   };
 
@@ -112,7 +85,7 @@ const Profile = () => {
                   <img src={assets.profile_icon} alt="Profile" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  {formData.firstName} {formData.lastName}
+                  {userDetails.name}
                 </h2>
               </div>
 
@@ -121,14 +94,16 @@ const Profile = () => {
                   <div className="w-5 h-5 bg-gray-100 rounded flex items-center justify-center mr-3">
                     <MdEmail />
                   </div>
-                  <span className="text-gray-900">{formData.email}</span>
+                  <span className="text-gray-900">{userDetails.email}</span>
                 </div>
 
                 <div className="flex items-center text-sm">
                   <div className="w-5 h-5 bg-gray-100 rounded flex items-center justify-center mr-3">
                     <MdLocalPhone />
                   </div>
-                  <span className="text-gray-900">{formData.phone}</span>
+                  <span className="text-gray-900">
+                    {userDetails.phone || "Not Provided"}
+                  </span>
                 </div>
 
                 <div className="flex items-start text-sm">
@@ -139,7 +114,7 @@ const Profile = () => {
                     {formData.addresses
                       .filter((addr) => addr.isDefault)
                       .map((addr) => (
-                        <div key={addr.id}>
+                        <div key={addr._id}>
                           <div className="font-medium text-gray-900">
                             {addr.street}
                           </div>
@@ -167,42 +142,27 @@ const Profile = () => {
                   <h4 className="text-md font-medium text-gray-900 mb-4">
                     Personal Information
                   </h4>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      User Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name || ""}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors mb-4"
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.firstName}
-                        onChange={(e) =>
-                          handleInputChange("firstName", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.lastName}
-                        onChange={(e) =>
-                          handleInputChange("lastName", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors"
-                      />
-                    </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Email
                       </label>
                       <input
                         type="email"
-                        value={formData.email}
+                        value={formData.email || ""}
                         onChange={(e) =>
                           handleInputChange("email", e.target.value)
                         }
@@ -216,7 +176,7 @@ const Profile = () => {
                       </label>
                       <input
                         type="tel"
-                        value={formData.phone}
+                        value={formData.phone || ""}
                         onChange={(e) =>
                           handleInputChange("phone", e.target.value)
                         }
@@ -228,12 +188,16 @@ const Profile = () => {
 
                 {/* Address Management */}
                 <div className="border-t pt-6">
+                  <p className="font-normal text-sm mb-6 text-center">
+                    Note: The below information is for delivery purpose only,
+                    Not Your Login Credentials
+                  </p>
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-md font-medium text-gray-900">
                       Addresses
                     </h4>
                     <button
-                      onClick={() => setShowAddAddress(true)}
+                      onClick={() => navigate("/add-address")}
                       className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dull transition-colors cursor-pointer"
                     >
                       Add New Address
@@ -241,14 +205,14 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {formData.addresses.map((address) => (
+                    {formData.addresses.map((address, index) => (
                       <div
-                        key={address.id}
+                        key={address._id}
                         className="border border-gray-200 rounded-lg p-4"
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            {`Address - ${address.id}`}
+                            {`Address - ${index + 1}`}
                             {address.isDefault && (
                               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
                                 Default
@@ -259,7 +223,7 @@ const Profile = () => {
                             {!address.isDefault && (
                               <button
                                 onClick={() =>
-                                  handleSetDefaultAddress(address.id)
+                                  handleSetDefaultAddress(address._id)
                                 }
                                 className="text-sm text-primary hover:text-primary-dull cursor-pointer"
                               >
@@ -267,7 +231,7 @@ const Profile = () => {
                               </button>
                             )}
                             <button
-                              onClick={() => handleRemoveAddress(address.id)}
+                              onClick={() => handleRemoveAddress(address._id)}
                               className="text-sm text-red-600 hover:text-red-700 cursor-pointer"
                             >
                               Remove
@@ -276,14 +240,54 @@ const Profile = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="md:col-span-2">
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              First Name
+                            </label>
                             <input
                               type="text"
-                              placeholder="Street Address"
+                              placeholder="First Name"
+                              value={address.firstName}
+                              onChange={(e) =>
+                                handleAddressChange(
+                                  address._id,
+                                  "firstName",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
+                            />
+                          </div>
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="First Name"
+                              value={address.lastName}
+                              onChange={(e) =>
+                                handleAddressChange(
+                                  address._id,
+                                  "lastName",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Street
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Street"
                               value={address.street}
                               onChange={(e) =>
                                 handleAddressChange(
-                                  address.id,
+                                  address._id,
                                   "street",
                                   e.target.value
                                 )
@@ -291,14 +295,17 @@ const Profile = () => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
                             />
                           </div>
-                          <div>
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              City
+                            </label>
                             <input
                               type="text"
                               placeholder="City"
                               value={address.city}
                               onChange={(e) =>
                                 handleAddressChange(
-                                  address.id,
+                                  address._id,
                                   "city",
                                   e.target.value
                                 )
@@ -306,28 +313,72 @@ const Profile = () => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              State
+                            </label>
                             <input
                               type="text"
                               placeholder="State"
                               value={address.state}
                               onChange={(e) =>
                                 handleAddressChange(
-                                  address.id,
+                                  address._id,
                                   "state",
                                   e.target.value
                                 )
                               }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
                             />
+                          </div>
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Zip Code
+                            </label>
                             <input
                               type="text"
-                              placeholder="ZIP Code"
+                              placeholder="Zip Code"
                               value={address.zipCode}
                               onChange={(e) =>
                                 handleAddressChange(
-                                  address.id,
+                                  address._id,
                                   "zipCode",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
+                            />
+                          </div>
+                          <div className="md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Country"
+                              value={address.country}
+                              onChange={(e) =>
+                                handleAddressChange(
+                                  address._id,
+                                  "country",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Phone Number
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Phone Number"
+                              value={address.phone}
+                              onChange={(e) =>
+                                handleAddressChange(
+                                  address._id,
+                                  "phone",
                                   e.target.value
                                 )
                               }
@@ -338,83 +389,6 @@ const Profile = () => {
                       </div>
                     ))}
                   </div>
-
-                  {/* Add New Address Form */}
-                  {showAddAddress && (
-                    <div className="mt-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <h5 className="text-sm font-medium text-gray-900 mb-3">
-                        Add New Address
-                      </h5>
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          placeholder="Street Address"
-                          value={newAddress.street}
-                          onChange={(e) =>
-                            setNewAddress((prev) => ({
-                              ...prev,
-                              street: e.target.value,
-                            }))
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
-                        />
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                          <input
-                            type="text"
-                            placeholder="City"
-                            value={newAddress.city}
-                            onChange={(e) =>
-                              setNewAddress((prev) => ({
-                                ...prev,
-                                city: e.target.value,
-                              }))
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
-                          />
-                          <input
-                            type="text"
-                            placeholder="State"
-                            value={newAddress.state}
-                            onChange={(e) =>
-                              setNewAddress((prev) => ({
-                                ...prev,
-                                state: e.target.value,
-                              }))
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
-                          />
-                          <input
-                            type="text"
-                            placeholder="ZIP Code"
-                            value={newAddress.zipCode}
-                            onChange={(e) =>
-                              setNewAddress((prev) => ({
-                                ...prev,
-                                zipCode: e.target.value,
-                              }))
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors text-sm"
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            onClick={handleAddNewAddress}
-                            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dull transition-colors cursor-pointer"
-                          >
-                            Add Address
-                          </button>
-                          <button
-                            onClick={() => setShowAddAddress(false)}
-                            className="px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-400 transition-colors cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Save Button */}

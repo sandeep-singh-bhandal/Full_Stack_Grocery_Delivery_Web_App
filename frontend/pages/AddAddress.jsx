@@ -19,7 +19,6 @@ const AddAddress = () => {
   const [address, setAddress] = useState({
     firstName: "",
     lastName: "",
-    email: "",
     street: "",
     city: "",
     state: "",
@@ -57,7 +56,7 @@ const AddAddress = () => {
   return (
     <div className="mt-10 pb-16">
       <button
-        onClick={() => navigate("/cart")}
+        onClick={() => navigate("/")}
         className="group mb-6 flex scale-125 gap-1.5 cursor-pointer hover:-translate-x-1.5 transition-transform duration-150"
       >
         <img src={assets.arrow_right_icon_colored} alt="back" />
@@ -85,13 +84,6 @@ const AddAddress = () => {
                 placeholder={"Enter Your Last Name"}
               />
             </div>
-            <InputField
-              type="email"
-              handleChange={handleChange}
-              address={address}
-              name="email"
-              placeholder={"Enter Your Email Address"}
-            />
             <InputField
               type="text"
               handleChange={handleChange}

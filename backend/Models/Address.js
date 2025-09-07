@@ -14,10 +14,6 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    email: {
-      type: String,
-      required: true,
-    },
     street: {
       type: String,
       required: true,
