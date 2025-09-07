@@ -90,6 +90,12 @@ const Navbar = () => {
             <ul className="hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200 py-2.5 w-36 rounded-md text-sm z-40">
               <li
                 className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
+                onClick={() => navigate("/my-profile")}
+              >
+                Profile
+              </li>
+              <li
+                className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
                 onClick={() => navigate("/my-orders")}
               >
                 My Orders

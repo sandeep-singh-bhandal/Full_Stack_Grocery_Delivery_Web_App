@@ -47,7 +47,7 @@ const Login = () => {
       <form
         onSubmit={onSubmitHandler}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-6 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
+        className="flex flex-col gap-5 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
       >
         <p className="text-2xl font-medium m-auto">
           <span className="text-primary">User</span>{" "}

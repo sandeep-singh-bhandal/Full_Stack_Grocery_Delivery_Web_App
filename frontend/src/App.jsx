@@ -18,6 +18,7 @@ import AddProduct from "../pages/Seller/AddProduct";
 import ProductList from "../pages/Seller/ProductList";
 import Orders from "../pages/Seller/Orders";
 import DeleteAccountModal from "../components/DeleteAccountModal";
+import Profile from "../pages/Profile";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/add-address" element={<AddAddress />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/my-profile" element={<Profile />} />
           <Route
             path="/seller"
             element={isSeller ? <SellerLayout /> : <SellerLogin />}
