@@ -16,7 +16,10 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Allowed URLs to access the backend
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://full-stack-grocery-delivery-web-app.vercel.app",
+];
 
 // Connecting To Mongo DB
 await connectDatabase();
@@ -29,9 +32,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   res.send("Server Started");
-})
+});
 
 // API Endpoints
 app.use("/api/user", userRouter);
@@ -40,7 +43,6 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/orders", orderRouter);
-
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
