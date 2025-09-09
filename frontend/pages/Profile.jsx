@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { MdEmail, MdLocalPhone, MdLocationOn } from "react-icons/md";
 import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const { axios, navigate } = useAppContext();
@@ -39,7 +40,6 @@ const Profile = () => {
   useEffect(() => {
     getUser();
   }, []);
-  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -71,6 +71,31 @@ const Profile = () => {
       ...prev,
       addresses: prev.addresses.filter((addr) => addr._id !== id),
     }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const loadingToast = toast.loading("Updating Product...");
+      const { data } = await axios.patch("/api/user/update-user", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      toast.dismiss(loadingToast);
+      if (data.success) {
+        toast.success(data.message);
+        getUser();
+      } else {
+        if (data.errors) {
+          toast.error(data.errors[0].message);
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   return (
@@ -130,7 +155,7 @@ const Profile = () => {
           </div>
 
           {/* Edit Form - Right Side */}
-          <div className="lg:col-span-2">
+          <form onSubmit={handleSubmit} className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">
                 Edit Profile
@@ -175,7 +200,7 @@ const Profile = () => {
                         Phone
                       </label>
                       <input
-                        type="tel"
+                        type="text"
                         value={formData.phone || ""}
                         onChange={(e) =>
                           handleInputChange("phone", e.target.value)
@@ -198,6 +223,7 @@ const Profile = () => {
                     </h4>
                     <button
                       onClick={() => navigate("/add-address")}
+                      type="button"
                       className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dull transition-colors cursor-pointer"
                     >
                       Add New Address
@@ -393,13 +419,16 @@ const Profile = () => {
 
                 {/* Save Button */}
                 <div className="border-t pt-6">
-                  <button className="w-full md:w-auto px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dull  cursor-pointer transition-colors">
+                  <button
+                    type="submit"
+                    className="w-full md:w-auto px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dull  cursor-pointer transition-colors"
+                  >
                     Save Changes
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </main>

@@ -129,13 +129,46 @@ export const deleteAccount = async (req, res) => {
   }
 };
 
+// Get User - /api/user/get-user
 export const getUserById = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await UserModel.findById(userId);
     const userAddresses = await AddressModel.find({ userId });
-    const userDetails = [user,userAddresses];
+    const userDetails = [user, userAddresses];
     res.json({ success: true, user: userDetails });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// Update User - /api/user/update-user
+export const updateUser = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { email, username, phone, addresses } = req.body;
+    await UserModel.findByIdAndUpdate(userId, { email, name: username, phone });
+    const existingAddressesIds = (
+      await AddressModel.find({ userId }).select("_id")
+    ).map((objId) => objId._id.toString());
+
+    const incomingAddressesIds = addresses.map((add) => {
+      return add._id;
+    });
+
+    const deletedAddressesIds = existingAddressesIds.filter(
+      (id) => !incomingAddressesIds.includes(id?.toString())
+    );
+
+    deletedAddressesIds.map(
+      async (id) => await AddressModel.deleteOne({ _id: id })
+    );
+
+    addresses.map(async (add) => {
+      await AddressModel.findByIdAndUpdate(add._id, { ...add });
+    });
+    res.json({ success: true, message: "Updated Successfully" });
   } catch (err) {
     console.log(err.message);
     res.json({ success: false, message: err.message });

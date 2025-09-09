@@ -5,7 +5,14 @@ export const addAddress = async (req, res) => {
   try {
     const { address } = req.body;
     const { userId } = req.user;
-    await AddressModel.create({ ...address, userId });
+
+    const count = await AddressModel.countDocuments();
+
+    await AddressModel.create({
+      ...address,
+      isDefault: count === 0 ? true : false,
+      userId,
+    });
     res.json({ success: true, message: "Address Added Successfully" });
   } catch (err) {
     console.log(err);

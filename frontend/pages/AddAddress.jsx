@@ -33,7 +33,7 @@ const AddAddress = () => {
       const { data } = await axios.post("/api/address/add", { address });
       if (data.success) {
         toast.success(data.message);
-        navigate("/cart");
+        navigate("/");
       } else {
         toast.error(data.message);
       }

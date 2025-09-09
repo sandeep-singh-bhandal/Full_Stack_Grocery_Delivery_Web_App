@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: String,
+    },
     cartItems: {
       type: Object,
       default: {},

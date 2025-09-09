@@ -22,7 +22,7 @@ import Profile from "../pages/Profile";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
-  const { showUserLogin, isSeller, showDeleteAccountModal } = useAppContext();
+  const { showUserLogin, isSeller, showDeleteAccountModal,user } = useAppContext();
 
   return (
     <div className="text-default min-h-screen text-gray-700 bg-white">

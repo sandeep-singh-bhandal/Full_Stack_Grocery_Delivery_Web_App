@@ -35,6 +35,18 @@ const loginSchema = z.object({
     .max(24, "Password must be less than 24 character"),
 });
 
+// Validation for Updating Details
+const updateDetailsSchema = z.object({
+  email: z.email("Enter an valid email").toLowerCase(),
+  username: z.string().min(3, "Name too short"),
+  phone: z
+    .string()
+    .refine((val) => val === "" || /^(\+91)?[6-9]\d{9}$/.test(val), {
+      message: "Enter a valid Phone Number",
+    })
+    .optional(),
+});
+
 //Registration Validation Middleware
 export const registerValidator = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -86,6 +98,42 @@ export const loginValidator = async (req, res, next) => {
       return res.json({ success: false, errors: errors });
     }
     req.body = result.data;
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Login Validation Middleware
+export const updateDetailsValidator = async (req, res, next) => {
+  const { email, name, phone, addresses } = req.body;
+  if (!email)
+    return res.json({
+      success: false,
+      message: "Please provide an Email",
+    });
+  if (!name)
+    return res.json({
+      success: false,
+      message: "Please provide a Name",
+    });
+  if (
+    addresses.length > 0 &&
+    addresses.every((add) => add.isDefault === false)
+  ) {
+    addresses[0].isDefault = true;
+  }
+  try {
+    const result = updateDetailsSchema.safeParse({
+      email,
+      username: name,
+      phone,
+    });
+    if (!result.success) {
+      const errors = result.error.issues;
+      return res.json({ success: false, errors: errors });
+    }
+    req.body = { ...result.data, phone, addresses };
     next();
   } catch (error) {
     console.log(error);
