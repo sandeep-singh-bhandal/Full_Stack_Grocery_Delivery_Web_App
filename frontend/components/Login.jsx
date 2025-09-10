@@ -2,6 +2,7 @@ import React from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [state, setState] = React.useState("login");
@@ -42,12 +43,12 @@ const Login = () => {
   return (
     <div
       onClick={() => setShowUserLogin(false)}
-      className="fixed inset-0 z-30 flex items-center text-sm text-gray-600 bg-black/50"
+      className="fixed inset-0 z-30 flex items-center text-sm text-gray-600 bg-black/50 backdrop-blur-sm"
     >
       <form
         onSubmit={onSubmitHandler}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-5 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
+        className="flex flex-col gap-4 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
       >
         <p className="text-2xl font-medium m-auto">
           <span className="text-primary">User</span>{" "}
@@ -114,30 +115,37 @@ const Login = () => {
             </div>
           </div>
         )}
+        {state === "login" && (
+          <div className="text-left text-primary">
+            <Link to="/forgot-password" onClick={()=>setShowUserLogin(false)} className="text-sm" href="#">
+              Forgot password?
+            </Link>
+          </div>
+        )}
+        <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
+          {state === "register" ? "Create Account" : "Login"}
+        </button>
         {state === "register" ? (
-          <p>
+          <p className="text-center w-full">
             Already have account?{" "}
             <span
               onClick={() => setState("login")}
               className="text-primary cursor-pointer"
             >
-              click here
+              Log in
             </span>
           </p>
         ) : (
-          <p>
-            Create an account?{" "}
+          <p className="text-center w-full">
+            Don’t have an account?{" "}
             <span
               onClick={() => setState("register")}
               className="text-primary cursor-pointer"
             >
-              click here
+              Sign up
             </span>
           </p>
         )}
-        <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
-          {state === "register" ? "Create Account" : "Login"}
-        </button>
       </form>
     </div>
   );

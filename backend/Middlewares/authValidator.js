@@ -26,6 +26,29 @@ const registerSchema = z
     }
   });
 
+const newPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(8, "Password must be 8 character long")
+      .max(24, "Password must be less than 24 character")
+      .regex(/[A-Z]/, "Password must contain a Capital Letter")
+      .regex(/[a-z]/, "Password must contain a Small Letter")
+      .regex(/[0-9]/, "Password must contain a Number")
+      .regex(/[^A-Za-z0-9]/, "Password must contain a Special Character")
+      .regex(/^\S*$/, "Password should not contain any spaces"),
+    confirmNewPassword: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Password do not match",
+      });
+    }
+  });
+
 // Validation for Login
 const loginSchema = z.object({
   email: z.email("Enter an valid email").toLowerCase(),
@@ -134,6 +157,34 @@ export const updateDetailsValidator = async (req, res, next) => {
       return res.json({ success: false, errors: errors });
     }
     req.body = { ...result.data, phone, addresses };
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const newPasswordValidator = async (req, res, next) => {
+  const { newPassword, confirmNewPassword, email } = req.body;
+  if (!newPassword)
+    return res.json({
+      success: false,
+      message: "Please set a new password",
+    });
+  if (!confirmNewPassword)
+    return res.json({
+      success: false,
+      message: "Please confirm your password",
+    });
+  try {
+    const result = newPasswordSchema.safeParse({
+      newPassword,
+      confirmNewPassword,
+    });
+    if (!result.success) {
+      const errors = result.error.issues;
+      return res.json({ success: false, errors: errors });
+    }
+    req.body = { newPassword: result.data.newPassword, email };
     next();
   } catch (error) {
     console.log(error);

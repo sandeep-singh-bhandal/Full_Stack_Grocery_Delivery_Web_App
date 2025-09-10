@@ -19,14 +19,18 @@ import ProductList from "../pages/Seller/ProductList";
 import Orders from "../pages/Seller/Orders";
 import DeleteAccountModal from "../components/DeleteAccountModal";
 import Profile from "../pages/Profile";
+import ForgotPassword from "../pages/ForgotPasssword";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
-  const { showUserLogin, isSeller, showDeleteAccountModal,user } = useAppContext();
+  const isForgotPasswordPath =
+    useLocation().pathname.includes("forgot-password");
+  const { showUserLogin, isSeller, showDeleteAccountModal, user } =
+    useAppContext();
 
   return (
     <div className="text-default min-h-screen text-gray-700 bg-white">
-      {isSellerPath ? null : <Navbar />}
+      {isSellerPath || isForgotPasswordPath ? null : <Navbar />}
       {showUserLogin && <Login />}
       {showDeleteAccountModal && <DeleteAccountModal />}
 
@@ -45,6 +49,7 @@ const App = () => {
           <Route path="/add-address" element={<AddAddress />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/my-profile" element={<Profile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
             path="/seller"
             element={isSeller ? <SellerLayout /> : <SellerLogin />}
@@ -55,7 +60,7 @@ const App = () => {
           </Route>
         </Routes>
       </div>
-      {!isSellerPath && <Footer />}
+      {isForgotPasswordPath || isSellerPath ? null : <Footer />}
     </div>
   );
 };

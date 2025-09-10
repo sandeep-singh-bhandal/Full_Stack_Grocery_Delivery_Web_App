@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    resetCode: {
+      type: String,
+      required: true,
+    },
+    resetCodeExpireAt: {
+      type: String,
+      required: true,
+    },
   },
   { minimize: false }
 );

@@ -2,6 +2,8 @@ import UserModel from "../Models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import AddressModel from "../Models/Address.js";
+import z from "zod";
+import transporter from "../Config/nodemailer.js";
 
 //Registering User - /api/user/register
 export const register = async (req, res) => {
@@ -172,5 +174,77 @@ export const updateUser = async (req, res) => {
   } catch (err) {
     console.log(err.message);
     res.json({ success: false, message: err.message });
+  }
+};
+
+export const requestCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const checkEmail = z.object({
+      email: z.email("Enter an valid email"),
+    });
+    if (!email)
+      return res.json({ success: false, message: "Please enter an email" });
+    const result = checkEmail.safeParse({ email });
+    if (!result.success) {
+      const errors = result.error.issues;
+      return res.json({ success: false, errors: errors });
+    }
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.json({ success: false, message: "User not found" });
+    const code = Math.floor(100000 + Math.random() * 900000);
+    await UserModel.findOneAndUpdate(
+      { email },
+      { resetCode: code, resetCodeExpireAt: Date.now() + 15 * 60 * 1000 }
+    );
+    await transporter.sendMail({
+      from: `"GreenCart Admin" <mr.money.bhandal@gmail.com>`,
+      to: email,
+      subject: "Password Reset Code",
+      text: `Your password reset code is ${code}.\nUse this to reset your password, the code is valid for 15 minutes only.`,
+    });
+    res.json({ success: true, message: "Code sent successfully" });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+    console.log(err.message);
+  }
+};
+export const verifyCode = async (req, res) => {
+  try {
+    const { code, email } = req.body;
+    if (!code || code.length < 6) {
+      return res.json({
+        success: false,
+        message: "Please enter the 6 digit code",
+      });
+    }
+    const user = await UserModel.findOne({ email });
+    if (user.resetCode === "" || user.resetCode !== code) {
+      return res.json({
+        success: false,
+        message: "Incorrect code",
+      });
+    }
+    if (user.resetCodeExpireAt < Date.now()) {
+      return res.json({
+        success: false,
+        message: "Code Expired",
+      });
+    }
+    res.json({ success: true, message: "Code verified successfully" });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+    console.log(err.message);
+  }
+};
+export const resetPassword = async (req, res) => {
+  try {
+    const { newPassword, email } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await UserModel.findOneAndUpdate({ email }, { password: hashedPassword });
+    res.json({ success: true, message: "Password reset successfully" });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+    console.log(err.message);
   }
 };
