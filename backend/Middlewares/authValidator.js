@@ -40,7 +40,7 @@ const newPasswordSchema = z
     confirmNewPassword: z.string(),
   })
   .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
+    if (data.newPassword !== data.confirmNewPassword) {
       ctx.addIssue({
         code: "custom",
         path: ["confirmPassword"],

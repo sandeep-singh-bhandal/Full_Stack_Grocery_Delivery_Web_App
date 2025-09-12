@@ -24,11 +24,9 @@ const userSchema = new mongoose.Schema(
     },
     resetCode: {
       type: String,
-      required: true,
     },
     resetCodeExpireAt: {
-      type: String,
-      required: true,
+      type: Date,
     },
   },
   { minimize: false }

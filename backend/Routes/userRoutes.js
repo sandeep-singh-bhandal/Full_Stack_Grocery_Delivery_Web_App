@@ -11,7 +11,7 @@ import {
   updateUser,
   verifyCode,
 } from "../Controllers/userControllers.js";
-import { authUser } from "../Middlewares/authUser.js";
+import { authResetPassword, authUser } from "../Middlewares/authUser.js";
 import {
   loginValidator,
   newPasswordValidator,
@@ -28,12 +28,12 @@ userRouter.get("/logout", authUser, logout);
 userRouter.delete("/delete", authUser, deleteAccount);
 userRouter.get("/get-user", authUser, getUserById);
 userRouter.patch("/update-user", authUser, updateDetailsValidator, updateUser);
-userRouter.post("/request-code", authUser, requestCode);
-userRouter.post("/verify-code", authUser, verifyCode);
+userRouter.post("/request-code", requestCode);
+userRouter.post("/verify-code", verifyCode);
 userRouter.post(
   "/reset-password",
-  authUser,
   newPasswordValidator,
+  authResetPassword,
   resetPassword
 );
 

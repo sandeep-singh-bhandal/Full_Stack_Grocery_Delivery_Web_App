@@ -231,6 +231,15 @@ export const verifyCode = async (req, res) => {
         message: "Code Expired",
       });
     }
+    const token = jwt.sign({ email }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "15m",
+    });
+    res.cookie("passwordResetToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     res.json({ success: true, message: "Code verified successfully" });
   } catch (err) {
     res.json({ success: false, error: err.message });
@@ -241,7 +250,10 @@ export const resetPassword = async (req, res) => {
   try {
     const { newPassword, email } = req.body;
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await UserModel.findOneAndUpdate({ email }, { password: hashedPassword });
+    await UserModel.findOneAndUpdate(
+      { email },
+      { password: hashedPassword, resetCode: "", resetCodeExpireAt: "" }
+    );
     res.json({ success: true, message: "Password reset successfully" });
   } catch (err) {
     res.json({ success: false, error: err.message });

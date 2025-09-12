@@ -1,12 +1,29 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { useRef } from "react";
+import { IoLockClosed } from "react-icons/io5";
+import toast from "react-hot-toast";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+
 const ForgotPassword = () => {
-  const [showOtpForm, setShowOtpForm] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showEmailForm, setShowEmailForm] = useState(true);
-  const { setShowUserLogin } = useAppContext();
+  const [showOtpForm, setShowOtpForm] = useState(false);
+  const [showConfirmPasswordForm, setShowConfirmPasswordForm] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState(Number(searchParams.get("step")) || 0);
+  const [formData, setFormData] = useState({
+    email: sessionStorage.getItem("email") || "",
+    code: sessionStorage.getItem("code") || "",
+    newPassword: sessionStorage.getItem("newPassword") || "",
+    confirmNewPassword: sessionStorage.getItem("confirmNewPassword") || "",
+  });
+  const { setShowUserLogin, axios, navigate } = useAppContext();
   const inputRefs = useRef([]);
+
+  // Handler Functions
   const handleInput = (e, index) => {
     if (e.target.value.length > 0 && index < inputRefs.current.length - 1) {
       inputRefs.current[index + 1].focus();
@@ -26,26 +43,106 @@ const ForgotPassword = () => {
       }
     });
   };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (inputRefs.current.length === 6 && name === "code") {
+      const code = inputRefs.current.map((val) => val.value).join("");
+      setFormData({
+        ...formData,
+        code: code,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    const { data } = await axios.post("/api/user/request-code", {
+      email: formData.email,
+    });
+    data.success
+      ? (toast.success(data.message),
+        setStep(1),
+        setSearchParams({ step: "1" }))
+      : data.errors
+      ? toast.error(data.errors[0].message)
+      : toast.error(data.message);
+  };
+  const handleCodeSubmit = async (e) => {
+    e.preventDefault();
+    const { data } = await axios.post("/api/user/verify-code", {
+      email: formData.email,
+      code: formData.code,
+    });
+    data.success
+      ? (toast.success(data.message),
+        setStep(2),
+        setSearchParams({ step: "2" }))
+      : toast.error(data.message);
+  };
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    const { data } = await axios.post("/api/user/reset-password", {
+      email: formData.email,
+      newPassword: formData.newPassword,
+      confirmNewPassword: formData.confirmNewPassword,
+    });
+    data.success
+      ? (toast.success(data.message),
+        setStep(0),
+        sessionStorage.clear(),
+        setSearchParams({}),
+        navigate("/"))
+      : data.errors
+      ? toast.error(data.errors[0].message)
+      : toast.error(data.message);
+  };
+
+  useEffect(() => {
+    step === 1
+      ? (setShowEmailForm(false), setShowOtpForm(true))
+      : step === 2
+      ? (setShowOtpForm(false), setShowConfirmPasswordForm(true))
+      : null;
+  }, [step]);
+
+  // Storing form data locally
+  useEffect(() => {
+    sessionStorage.setItem("email", formData.email);
+  }, [formData.email]);
+  useEffect(() => {
+    sessionStorage.setItem("code", formData.code);
+  }, [formData.code]);
+  useEffect(() => {
+    sessionStorage.setItem("password", formData.newPassword);
+  }, [formData.newPassword]);
+  useEffect(() => {
+    sessionStorage.setItem("password", formData.confirmNewPassword);
+  }, [formData.confirmNewPassword]);
+
   return (
-    <div className="fixed inset-0 z-2 flex justify-center items-center bg-black/20">
-      {showEmailForm && (
-        <form className="space-y-2 text-gray-500 bg-white max-w-96 mx-4 md:p-6 p-4 text-left text-sm rounded shadow-[0px_0px_10px_0px] shadow-black/10">
+    <div className="fixed inset-0 z-2 flex justify-center items-center bg-black/30">
+      {showEmailForm && step === 0 && (
+        <form
+          onSubmit={handleEmailSubmit}
+          className="space-y-2 text-gray-500 bg-white max-w-96 mx-4 md:p-6 p-4 text-left text-sm rounded shadow-[0px_0px_10px_0px] shadow-black/10"
+        >
           <h2 className="text-2xl font-semibold text-center text-gray-800">
-            Forget Password?
+            Forgot Password?
           </h2>
           <label htmlFor="email">Email</label>
           <input
-            id="email"
+            name="email"
             className="w-full border-2 mt-1 border-gray-500/30 focus:border-primary outline-none rounded py-2.5 px-4"
-            type="email"
             placeholder="Enter your email"
+            value={formData.email}
+            onChange={(e) => handleChange(e)}
           />
           <button
-            onClick={() => {
-              setShowOtpForm(true);
-              setShowEmailForm(false);
-            }}
-            type="button"
+            type="submit"
             className="w-full my-3 bg-primary hover:bg-primary-dull cursor-pointer active:scale-95 transition py-2.5 rounded text-white"
           >
             Send Code
@@ -62,33 +159,101 @@ const ForgotPassword = () => {
           </p>
         </form>
       )}
-      {showOtpForm && (
-        <form class="bg-white text-gray-500 max-w-96 mx-4 md:py-10 md:px-6 px-4 py-8 text-left text-sm rounded-lg transition-all shadow-[0px_0px_10px_0px] shadow-black/10">
-          <h2 class="text-2xl font-semibold mb-4 text-center text-gray-800">
+      {showOtpForm && step === 1 && (
+        <form
+          onSubmit={handleCodeSubmit}
+          className="bg-white text-gray-500 max-w-96 mx-4 md:py-10 md:px-6 px-4 py-8 text-left text-sm rounded-lg transition-all shadow-[0px_0px_10px_0px] shadow-black/10"
+        >
+          <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800">
             Two-factor Authentication
           </h2>
           <p>Please enter the authentication code</p>
-          <p class="text-gray-500/60 mb-4">
+          <p className="text-gray-500/60 mb-4">
             The authentication code has been sent to your email:
           </p>
-          <div class="flex items-center justify-between mb-6" onPaste={handlePaste}>
-            {Array(6).fill(0).map((_, index) => (
-              <input
-                class="otp-input w-10 h-10 border-2 border-gray-300 outline-none rounded text-center text-lg focus:border-primary transition duration-300"
-                type="text"
-                maxlength="1"
-                required
-                ref={(e) => (inputRefs.current[index] = e)}
-                onInput={(e) => handleInput(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-              />
-            ))}
+          <div
+            className="flex items-center justify-between mb-6"
+            onPaste={handlePaste}
+          >
+            {Array(6)
+              .fill(0)
+              .map((_, index) => (
+                <input
+                  key={index}
+                  autoFocus={index === 0 ? true : false}
+                  autoComplete="off"
+                  name="code"
+                  className="otp-input w-10 h-10 border-2 border-gray-300 outline-none rounded text-center text-lg focus:border-primary transition duration-300"
+                  type="text"
+                  maxLength="1"
+                  ref={(e) => (inputRefs.current[index] = e)}
+                  onInput={(e) => handleInput(e, index)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  onChange={handleChange}
+                />
+              ))}
           </div>
           <button
             type="submit"
-            class="w-full my-1 bg-primary hover:bg-primary-dull cursor-pointer py-2.5 rounded text-white active:scale-95 transition"
+            className="w-full my-1 bg-primary hover:bg-primary-dull cursor-pointer py-2.5 rounded text-white active:scale-95 transition"
           >
             Verify
+          </button>
+        </form>
+      )}
+      {showConfirmPasswordForm && step === 2 && (
+        <form
+          onSubmit={handlePasswordReset}
+          className="max-w-96 space-y-2 w-full text-center border border-gray-300/60 rounded-2xl px-8 bg-white"
+        >
+          <h1 className="text-gray-900 text-2xl mt-10 font-medium">
+            Create a new password
+          </h1>
+
+          <label className="float-left mt-4">New Password</label>
+          <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
+            <IoLockClosed className="h-5 w-5" />
+            <input
+              type={showPassword ? "text" : "password"}
+              name="newPassword"
+              placeholder="Password"
+              autoComplete="off"
+              className="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full"
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="cursor-pointer absolute right-3 my-auto scale-125"
+            >
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </button>
+          </div>
+          <label className="float-left mt-4">Confirm New Password</label>
+          <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
+            <IoLockClosed className="h-5 w-5" />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              autoComplete="off"
+              className="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full"
+              name="confirmNewPassword"
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="cursor-pointer absolute right-3 my-auto scale-125"
+            >
+              {showConfirmPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            className="mt-5 mb-11 w-full h-11 rounded-full text-white bg-primary hover:bg-primary-dull cursor-pointer transition-opacity"
+          >
+            Continue
           </button>
         </form>
       )}
