@@ -117,10 +117,10 @@ const ForgotPassword = () => {
     sessionStorage.setItem("code", formData.code);
   }, [formData.code]);
   useEffect(() => {
-    sessionStorage.setItem("password", formData.newPassword);
+    sessionStorage.setItem("newPassword", formData.newPassword);
   }, [formData.newPassword]);
   useEffect(() => {
-    sessionStorage.setItem("password", formData.confirmNewPassword);
+    sessionStorage.setItem("confirmNewPassword", formData.confirmNewPassword);
   }, [formData.confirmNewPassword]);
 
   return (

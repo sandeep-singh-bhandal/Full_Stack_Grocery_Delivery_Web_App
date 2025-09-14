@@ -203,6 +203,7 @@ export const requestCode = async (req, res) => {
       subject: "Password Reset Code",
       text: `Your password reset code is ${code}.\nUse this to reset your password, the code is valid for 15 minutes only.`,
     });
+
     res.json({ success: true, message: "Code sent successfully" });
   } catch (err) {
     res.json({ success: false, error: err.message });

@@ -22,7 +22,10 @@ export const authResetPassword = async (req, res, next) => {
   const { passwordResetToken } = req.cookies;
 
   if (!passwordResetToken)
-    return res.json({ success: false, message: "Not Authorized" });
+    return res.json({
+      success: false,
+      message: "Please enter the 6 digit code",
+    });
 
   try {
     const decodedToken = jwt.verify(
