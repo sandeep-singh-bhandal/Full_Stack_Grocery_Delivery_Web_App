@@ -204,7 +204,7 @@ const Login = () => {
           {state === "register" ? "Create Account" : "Login"}
           {loading && (
             <div
-              class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+              className="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
               role="status"
               aria-label="loading"
             ></div>

@@ -1,10 +1,13 @@
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
+import { useState } from "react";
 
 export default function DeleteAccountModal() {
   const { setShowDeleteAccountModal, axios, setUser } = useAppContext();
+  const [loading, setLoading] = useState(false);
 
   const deleteAccount = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.delete("/api/user/delete");
       if (data.success) {
@@ -15,6 +18,7 @@ export default function DeleteAccountModal() {
     } catch (error) {
       toast.success(error.message);
     }
+    setLoading(false);
   };
   return (
     <div
@@ -59,9 +63,18 @@ export default function DeleteAccountModal() {
           <button
             onClick={deleteAccount}
             type="button"
-            className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium text-sm hover:bg-red-700 active:scale-95 transition cursor-pointer"
+            className={`${
+              loading ? "bg-gray-300" : "bg-red-600 hover:bg-red-700"
+            }  w-full md:w-36 h-10 rounded-md text-white  font-medium text-sm  active:scale-95 transition cursor-pointer`}
           >
-            Confirm
+            {loading ? "Deleting" : "Confirm"}
+            {loading && (
+              <div
+                className="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                role="status"
+                aria-label="loading"
+              ></div>
+            )}
           </button>
         </div>
       </div>

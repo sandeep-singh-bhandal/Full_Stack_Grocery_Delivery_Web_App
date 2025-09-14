@@ -169,7 +169,7 @@ const ForgotPassword = () => {
             {loading ? "Sending Code" : "Send Code"}
             {loading && (
               <div
-                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                className="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
                 role="status"
                 aria-label="loading"
               ></div>
@@ -231,7 +231,7 @@ const ForgotPassword = () => {
             {loading ? "Verifying" : "Verify"}
             {loading && (
               <div
-                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                className="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
                 role="status"
                 aria-label="loading"
               ></div>
@@ -320,7 +320,7 @@ const ForgotPassword = () => {
             {loading ? "Please wait" : "Continue"}
             {loading && (
               <div
-                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                className="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
                 role="status"
                 aria-label="loading"
               ></div>
