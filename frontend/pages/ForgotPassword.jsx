@@ -128,6 +128,7 @@ const ForgotPassword = () => {
   useEffect(() => {
     sessionStorage.setItem("confirmNewPassword", formData.confirmNewPassword);
   }, [formData.confirmNewPassword]);
+
   return (
     <div className="fixed inset-0 z-2 flex justify-center items-center bg-black/30">
       {showEmailForm && step === 0 && (
@@ -225,7 +226,7 @@ const ForgotPassword = () => {
             disabled={loading ? true : false}
             className={`${
               loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
-            }  flex justify-center items-center gap-1 w-full my-1 bg-primary hover:bg-primary-dull cursor-pointer py-2.5 rounded text-white active:scale-95 transition`}
+            }  flex justify-center items-center gap-1 w-full my-1 cursor-pointer py-2.5 rounded text-white active:scale-95 transition`}
           >
             {loading ? "Verifying" : "Verify"}
             {loading && (
@@ -314,7 +315,7 @@ const ForgotPassword = () => {
             disabled={loading ? true : false}
             className={`${
               loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
-            }  flex justify-center items-center gap-1 mt-5 mb-11 w-full h-11 rounded-full text-white bg-primary hover:bg-primary-dull cursor-pointer transition-opacity`}
+            }  flex justify-center items-center gap-1 mt-5 mb-11 w-full h-11 rounded-full text-white  cursor-pointer transition-opacity`}
           >
             {loading ? "Please wait" : "Continue"}
             {loading && (
