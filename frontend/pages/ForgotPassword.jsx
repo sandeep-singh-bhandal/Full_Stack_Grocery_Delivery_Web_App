@@ -62,49 +62,50 @@ const ForgotPassword = () => {
   };
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     const { data } = await axios.post("/api/user/request-code", {
       email: formData.email,
     });
     data.success
-      ? (toast.success(data.message),
+      ? (setLoading(true),
+        toast.success(data.message),
         setStep(1),
-        setSearchParams({ step: "1" }))
+        setSearchParams({ step: "1" }),
+        setLoading(false))
       : setSignUpError(data.message ? data.message : data.errors);
-    setLoading(false);
   };
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     const { data } = await axios.post("/api/user/verify-code", {
       email: formData.email,
       code: formData.code,
     });
     data.success
-      ? (toast.success(data.message),
+      ? (setLoading(true),
+        toast.success(data.message),
         setStep(2),
-        setLoading(false),
-        setSearchParams({ step: "2" }))
+        setSearchParams({ step: "2" }),
+        setLoading(false))
       : toast.error(data.message);
-    setLoading(false);
   };
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     const { data } = await axios.post("/api/user/reset-password", {
       email: formData.email,
       newPassword: formData.newPassword,
       confirmNewPassword: formData.confirmNewPassword,
     });
     data.success
-      ? (toast.success(data.message),
+      ? (setLoading(true),
+        toast.success(data.message),
         setStep(0),
-        setLoading(false),
         sessionStorage.clear(),
         setSearchParams({}),
-        navigate("/"))
+        navigate("/"),
+        setLoading(false))
       : setSignUpError(data.message ? data.message : data.errors);
-    setLoading(false);
   };
 
   useEffect(() => {
