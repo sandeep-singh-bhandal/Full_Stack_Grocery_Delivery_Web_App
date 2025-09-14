@@ -18,7 +18,7 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
-      
+      setLoading(true);
       const { data } = await axios.post(
         `/api/user/${state}`,
         state === "login"
@@ -26,12 +26,10 @@ const Login = () => {
           : { email, name, password, confirmPassword }
       );
       if (data.success) {
-        setLoading(true);
         navigate("/");
         setUser(data.user);
         toast.success(data.message);
         setShowUserLogin(false);
-        setLoading(false);
       } else {
         setSignUpError(data.message ? data.message : data.errors);
         setShowUserLogin(true);
@@ -40,7 +38,7 @@ const Login = () => {
       toast.error(error.message);
       setShowUserLogin(true);
     }
-    
+    setLoading(false);
   };
   return (
     <div
