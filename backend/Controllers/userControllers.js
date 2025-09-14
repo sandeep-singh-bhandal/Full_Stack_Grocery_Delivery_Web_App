@@ -9,9 +9,6 @@ import transporter from "../Config/nodemailer.js";
 export const register = async (req, res) => {
   try {
     const { email, name, password } = req.body;
-    // Checking if fields are missing
-    if (!name || !email || !password)
-      return res.json({ success: false, message: "Missing Details" });
 
     // Checking if user already exist
     const existingUser = await UserModel.findOne({ email });
@@ -63,7 +60,7 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.json({
         success: false,
-        message: "Incorrect Email and Password ",
+        message: "Incorrect Email or Password ",
       });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {

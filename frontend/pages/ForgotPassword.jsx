@@ -14,6 +14,9 @@ const ForgotPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [step, setStep] = useState(Number(searchParams.get("step")) || 0);
+  const [signUpError, setSignUpError] = useState(
+    Number(searchParams.get("step")) || 0
+  );
   const [formData, setFormData] = useState({
     email: sessionStorage.getItem("email") || "",
     code: sessionStorage.getItem("code") || "",
@@ -67,9 +70,7 @@ const ForgotPassword = () => {
       ? (toast.success(data.message),
         setStep(1),
         setSearchParams({ step: "1" }))
-      : data.errors
-      ? toast.error(data.errors[0].message)
-      : toast.error(data.message);
+      : setSignUpError(data.message ? data.message : data.errors);
   };
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
@@ -96,9 +97,7 @@ const ForgotPassword = () => {
         sessionStorage.clear(),
         setSearchParams({}),
         navigate("/"))
-      : data.errors
-      ? toast.error(data.errors[0].message)
-      : toast.error(data.message);
+      : setSignUpError(data.message ? data.message : data.errors);
   };
 
   useEffect(() => {
@@ -122,7 +121,6 @@ const ForgotPassword = () => {
   useEffect(() => {
     sessionStorage.setItem("confirmNewPassword", formData.confirmNewPassword);
   }, [formData.confirmNewPassword]);
-
   return (
     <div className="fixed inset-0 z-2 flex justify-center items-center bg-black/30">
       {showEmailForm && step === 0 && (
@@ -133,13 +131,25 @@ const ForgotPassword = () => {
           <h2 className="text-2xl font-semibold text-center text-gray-800">
             Forgot Password?
           </h2>
-          <label htmlFor="email">Email</label>
+
+          {typeof signUpError === "string" &&
+          signUpError.toLowerCase().includes("email") ? (
+            <span className="text-red-500">{signUpError}</span>
+          ) : Array.isArray(signUpError) &&
+            signUpError[0].path.includes("email") ? (
+            <span className="text-red-500">{signUpError[0].message}</span>
+          ) : (
+            <label htmlFor="email">Email</label>
+          )}
           <input
             name="email"
             className="w-full border-2 mt-1 border-gray-500/30 focus:border-primary outline-none rounded py-2.5 px-4"
             placeholder="Enter your email"
             value={formData.email}
-            onChange={(e) => handleChange(e)}
+            onChange={(e) => {
+              handleChange(e);
+              setSignUpError("");
+            }}
           />
           <button
             type="submit"
@@ -204,13 +214,26 @@ const ForgotPassword = () => {
       {showConfirmPasswordForm && step === 2 && (
         <form
           onSubmit={handlePasswordReset}
-          className="max-w-96 space-y-2 w-full text-center border border-gray-300/60 rounded-2xl px-8 bg-white"
+          className="max-w-96 space-y-2 w-full border border-gray-300/60 rounded-2xl px-8 bg-white"
         >
-          <h1 className="text-gray-900 text-2xl mt-10 font-medium">
+          <h1 className="text-gray-900 text-center text-2xl mt-10 font-medium">
             Create a new password
           </h1>
 
-          <label className="float-left mt-4">New Password</label>
+          {typeof signUpError === "string" &&
+          signUpError.toLowerCase().includes("new password") ? (
+            <span className="text-red-500 float-left mt-4">{signUpError}</span>
+          ) : Array.isArray(signUpError) &&
+            signUpError[0].path.includes("newPassword") ? (
+            <span className="text-red-500 float-left mt-4">
+              {signUpError[0].message}
+            </span>
+          ) : typeof signUpError === "string" &&
+            signUpError.toLowerCase().includes("incorrect") ? (
+            <span className="float-left mt-4">New Password</span>
+          ) : (
+            <span className="float-left mt-4">New Password</span>
+          )}
           <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
             <IoLockClosed className="h-5 w-5" />
             <input
@@ -229,7 +252,17 @@ const ForgotPassword = () => {
               {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </button>
           </div>
-          <label className="float-left mt-4">Confirm New Password</label>
+          {Array.isArray(signUpError) &&
+          signUpError[0].path.includes("confirmNewPassword") ? (
+            <span className="text-red-500 float-left mt-4">
+              {signUpError[0].message}
+            </span>
+          ) : typeof signUpError === "string" &&
+            signUpError.toLowerCase().includes("incorrect") ? (
+            <span className="float-left mt-4">New Password</span>
+          ) : (
+            <span className="float-left mt-4">New Password</span>
+          )}
           <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
             <IoLockClosed className="h-5 w-5" />
             <input

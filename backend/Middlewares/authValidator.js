@@ -43,7 +43,7 @@ const newPasswordSchema = z
     if (data.newPassword !== data.confirmNewPassword) {
       ctx.addIssue({
         code: "custom",
-        path: ["confirmPassword"],
+        path: ["confirmNewPassword"],
         message: "Password do not match",
       });
     }

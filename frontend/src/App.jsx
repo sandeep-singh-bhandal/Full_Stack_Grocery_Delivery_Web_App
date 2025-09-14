@@ -19,7 +19,7 @@ import ProductList from "../pages/Seller/ProductList";
 import Orders from "../pages/Seller/Orders";
 import DeleteAccountModal from "../components/DeleteAccountModal";
 import Profile from "../pages/Profile";
-import ForgotPassword from "../pages/ForgotPasssword";
+import ForgotPassword from "../pages/ForgotPassword";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
