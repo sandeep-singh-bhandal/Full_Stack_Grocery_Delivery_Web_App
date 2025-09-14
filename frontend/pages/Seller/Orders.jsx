@@ -21,6 +21,8 @@ const Orders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+  console.log(orders);
+  
 
   return (
     <div className="no-scrollbar flex-1 h-[95vh] overflow-y-scroll">

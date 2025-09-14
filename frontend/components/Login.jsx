@@ -13,10 +13,12 @@ const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [signUpError, setSignUpError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true);
       const { data } = await axios.post(
         `/api/user/${state}`,
         state === "login"
@@ -36,6 +38,7 @@ const Login = () => {
       toast.error(error.message);
       setShowUserLogin(true);
     }
+    setLoading(false);
   };
   return (
     <div
@@ -191,8 +194,21 @@ const Login = () => {
             </Link>
           </div>
         )}
-        <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
+        <button
+          type="submit"
+          disabled={loading ? true : false}
+          className={` ${
+            loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
+          }  flex justify-center items-center gap-1  transition-all text-white w-full py-2 rounded-md cursor-pointer`}
+        >
           {state === "register" ? "Create Account" : "Login"}
+          {loading && (
+            <div
+              class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+              role="status"
+              aria-label="loading"
+            ></div>
+          )}
         </button>
         {state === "register" ? (
           <p className="text-center w-full">

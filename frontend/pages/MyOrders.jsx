@@ -8,7 +8,7 @@ const MyOrders = () => {
   const fetchMyOrders = async () => {
     try {
       const { data } = await axios.get("/api/orders/user");
-      
+
       if (data.success) {
         setMyOrders(data.orders);
       }
@@ -20,6 +20,7 @@ const MyOrders = () => {
   useEffect(() => {
     if (user) fetchMyOrders();
   }, [user]);
+  console.log(myOrders);
 
   return (
     <div className="mt-16 pb-16">
@@ -51,7 +52,7 @@ const MyOrders = () => {
               <div className="flex items-center mb-4 md:mb-0">
                 <div className="bg-primary/10 p-4 rounded-lg">
                   <img
-                    src={item.product.image[0]}
+                    src={item.product.imagesData[0].url}
                     alt="image"
                     className="w-16 h-16"
                   />

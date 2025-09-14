@@ -13,10 +13,9 @@ const ForgotPassword = () => {
   const [showConfirmPasswordForm, setShowConfirmPasswordForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(Number(searchParams.get("step")) || 0);
-  const [signUpError, setSignUpError] = useState(
-    Number(searchParams.get("step")) || 0
-  );
+  const [signUpError, setSignUpError] = useState("");
   const [formData, setFormData] = useState({
     email: sessionStorage.getItem("email") || "",
     code: sessionStorage.getItem("code") || "",
@@ -63,6 +62,7 @@ const ForgotPassword = () => {
   };
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const { data } = await axios.post("/api/user/request-code", {
       email: formData.email,
     });
@@ -71,9 +71,11 @@ const ForgotPassword = () => {
         setStep(1),
         setSearchParams({ step: "1" }))
       : setSignUpError(data.message ? data.message : data.errors);
+    setLoading(false);
   };
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const { data } = await axios.post("/api/user/verify-code", {
       email: formData.email,
       code: formData.code,
@@ -81,11 +83,14 @@ const ForgotPassword = () => {
     data.success
       ? (toast.success(data.message),
         setStep(2),
+        setLoading(false),
         setSearchParams({ step: "2" }))
       : toast.error(data.message);
+    setLoading(false);
   };
   const handlePasswordReset = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const { data } = await axios.post("/api/user/reset-password", {
       email: formData.email,
       newPassword: formData.newPassword,
@@ -94,10 +99,12 @@ const ForgotPassword = () => {
     data.success
       ? (toast.success(data.message),
         setStep(0),
+        setLoading(false),
         sessionStorage.clear(),
         setSearchParams({}),
         navigate("/"))
       : setSignUpError(data.message ? data.message : data.errors);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -126,7 +133,7 @@ const ForgotPassword = () => {
       {showEmailForm && step === 0 && (
         <form
           onSubmit={handleEmailSubmit}
-          className="space-y-2 text-gray-500 bg-white max-w-96 mx-4 md:p-6 p-4 text-left text-sm rounded shadow-[0px_0px_10px_0px] shadow-black/10"
+          className="space-y-2 text-gray-500 bg-white w-96 mx-4 md:p-6 p-4 text-left text-sm rounded shadow-[0px_0px_10px_0px] shadow-black/10"
         >
           <h2 className="text-2xl font-semibold text-center text-gray-800">
             Forgot Password?
@@ -153,9 +160,19 @@ const ForgotPassword = () => {
           />
           <button
             type="submit"
-            className="w-full my-3 bg-primary hover:bg-primary-dull cursor-pointer active:scale-95 transition py-2.5 rounded text-white"
+            disabled={loading ? true : false}
+            className={` ${
+              loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
+            } flex justify-center items-center gap-1 w-full my-3  cursor-pointer active:scale-95 transition py-2.5 rounded text-white`}
           >
-            Send Code
+            {loading ? "Sending Code" : "Send Code"}
+            {loading && (
+              <div
+                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                role="status"
+                aria-label="loading"
+              ></div>
+            )}
           </button>
           <p className="text-center mt-4">
             Don’t have an account?{" "}
@@ -205,9 +222,19 @@ const ForgotPassword = () => {
           </div>
           <button
             type="submit"
-            className="w-full my-1 bg-primary hover:bg-primary-dull cursor-pointer py-2.5 rounded text-white active:scale-95 transition"
+            disabled={loading ? true : false}
+            className={`${
+              loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
+            }  flex justify-center items-center gap-1 w-full my-1 bg-primary hover:bg-primary-dull cursor-pointer py-2.5 rounded text-white active:scale-95 transition`}
           >
-            Verify
+            {loading ? "Verifying" : "Verify"}
+            {loading && (
+              <div
+                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                role="status"
+                aria-label="loading"
+              ></div>
+            )}
           </button>
         </form>
       )}
@@ -284,9 +311,19 @@ const ForgotPassword = () => {
 
           <button
             type="submit"
-            className="mt-5 mb-11 w-full h-11 rounded-full text-white bg-primary hover:bg-primary-dull cursor-pointer transition-opacity"
+            disabled={loading ? true : false}
+            className={`${
+              loading ? "bg-gray-300" : "bg-primary hover:bg-primary-dull"
+            }  flex justify-center items-center gap-1 mt-5 mb-11 w-full h-11 rounded-full text-white bg-primary hover:bg-primary-dull cursor-pointer transition-opacity`}
           >
-            Continue
+            {loading ? "Please wait" : "Continue"}
+            {loading && (
+              <div
+                class="animate-spin inline-block size-4 border-3 border-current border-t-transparent text-white rounded-full dark:text-white"
+                role="status"
+                aria-label="loading"
+              ></div>
+            )}
           </button>
         </form>
       )}
