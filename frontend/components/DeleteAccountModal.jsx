@@ -65,7 +65,7 @@ export default function DeleteAccountModal() {
             type="button"
             className={`${
               loading ? "bg-gray-300" : "bg-red-600 hover:bg-red-700"
-            }  w-full md:w-36 h-10 rounded-md text-white  font-medium text-sm  active:scale-95 transition cursor-pointer`}
+            }  flex justify-center items-center gap-1 w-full md:w-36 h-10 rounded-md text-white  font-medium text-sm  active:scale-95 transition cursor-pointer`}
           >
             {loading ? "Deleting" : "Confirm"}
             {loading && (
