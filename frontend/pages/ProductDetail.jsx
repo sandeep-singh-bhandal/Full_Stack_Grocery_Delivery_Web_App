@@ -3,6 +3,7 @@ import { useAppContext } from "../context/AppContext";
 import { Link, useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
 import ProductCard from "../components/ProductCard";
+import ReviewSection from "../components/ReviewSection";
 
 const ProductDetail = () => {
   const { products, navigate, currency, addToCart } = useAppContext();
@@ -120,6 +121,7 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+        <ReviewSection/>
         {/* Related Products */}
         <div className="flex flex-col items-center mt-20">
           <div className="flex flex-col w-max items-center">
