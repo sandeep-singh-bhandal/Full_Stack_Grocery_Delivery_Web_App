@@ -121,7 +121,7 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-        <ReviewSection/>
+        <ReviewSection productId={product._id} />
         {/* Related Products */}
         <div className="flex flex-col items-center mt-20">
           <div className="flex flex-col w-max items-center">

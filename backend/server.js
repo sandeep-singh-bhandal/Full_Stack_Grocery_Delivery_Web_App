@@ -10,6 +10,7 @@ import productRouter from "./Routes/productRoutes.js";
 import { cartRouter } from "./Routes/cartRoutes.js";
 import { addressRouter } from "./Routes/addressRoutes.js";
 import { orderRouter } from "./Routes/orderRoutes.js";
+import { reviewRouter } from "./Routes/reviewRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/review", reviewRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

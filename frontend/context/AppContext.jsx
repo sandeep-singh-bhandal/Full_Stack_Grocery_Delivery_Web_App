@@ -20,6 +20,7 @@ export const AppContextProvider = ({ children }) => {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
   const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   //Fetch Seller Status
   const fetchSeller = async () => {
@@ -150,6 +151,8 @@ export const AppContextProvider = ({ children }) => {
     setShowProductDeleteModal,
     showEditProductModal,
     setShowEditProductModal,
+    showReviewModal,
+    setShowReviewModal,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

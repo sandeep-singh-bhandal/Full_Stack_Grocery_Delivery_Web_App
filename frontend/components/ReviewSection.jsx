@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AllReviewDisplayModal from "./AllReviewDisplayModal";
+import { useAppContext } from "../context/AppContext";
+import { AiOutlineDislike, AiOutlineLike } from "react-icons/ai";
+import toast from "react-hot-toast";
 
 // Mock data for reviews
 const mockReviews = [
@@ -42,7 +46,9 @@ const mockReviews = [
 
 // Calculate rating statistics
 const ratingStats = {
-  average: 4.2,
+  average:
+    mockReviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
+    mockReviews.length,
   total: mockReviews.length,
   distribution: {
     5: mockReviews.filter((r) => r.rating === 5).length,
@@ -71,7 +77,7 @@ const Star = ({ filled, half = false }) => (
 );
 
 // Star Rating Display
-const StarRating = ({ rating, size = "default" }) => {
+export const StarRating = ({ rating, size = "default" }) => {
   const stars = [];
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
@@ -129,23 +135,29 @@ const RatingBar = ({ stars, count, total }) => {
   );
 };
 
-export default function ReviewSection() {
+export default function ReviewSection({ productId }) {
   const [newReview, setNewReview] = useState({
-    name: "",
     rating: 0,
     comment: "",
   });
+  const [mockReviews, setMockReviews] = useState([]);
+  const { showReviewModal, setShowReviewModal, axios } = useAppContext();
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (newReview.name && newReview.rating && newReview.comment) {
-      // In a real app, this would submit to an API
-      console.log("Submitting review:", newReview);
-      alert("Thank you for your review!");
+    if (newReview.rating && newReview.comment) {
+      const { data } = await axios.post("/api/review/add-review", {
+        ...newReview,
+        productId,
+      });
+      data.success ? toast.success(data.message) : toast.error(data.message);
       setNewReview({ name: "", rating: 0, comment: "" });
     }
   };
-
+  const fetchReviews = async () => {
+    const { data } = await axios.get(`api/review/get-reviews/${productId}`);
+    setMockReviews(data.review);
+  };
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -153,6 +165,10 @@ export default function ReviewSection() {
       day: "numeric",
     });
   };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [productId]);
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-background mt-20">
@@ -190,27 +206,6 @@ export default function ReviewSection() {
             <h3 className="text-xl font-semibold mb-4">Write a Review</h3>
             <form onSubmit={handleSubmitReview} className="space-y-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Your Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={newReview.name}
-                  onChange={(e) =>
-                    setNewReview({ ...newReview, name: e.target.value })
-                  }
-                  placeholder="Enter your name"
-                  required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none "
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Rating</label>
                 <InteractiveStarRating
                   rating={newReview.rating}
                   onRatingChange={(rating) =>
@@ -245,7 +240,7 @@ export default function ReviewSection() {
 
               <button
                 type="submit"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm text-white font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-dull h-10 px-4 py-2 w-full"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm text-white font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-dull h-10 px-4 py-2 w-full cursor-pointer"
               >
                 Submit Review
               </button>
@@ -279,28 +274,25 @@ export default function ReviewSection() {
                   {review.comment}
                 </p>
 
-                <div className="flex items-center justify-between">
-                  <button className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h2m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v11a2 2 0 002 2h2l3-3h6a2 2 0 002-2z"
-                      />
-                    </svg>
-                    Helpful ({review.helpful})
+                <div className="flex items-center gap-3">
+                  <button className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1">
+                    <AiOutlineLike />
+                    {review.helpful}
+                  </button>
+                  <button className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1">
+                    <AiOutlineDislike />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-          <button className="border border-gray-300 w-full rounded-lg py-2.5">Show more</button>
+          <button
+            onClick={() => setShowReviewModal(true)}
+            className="border border-gray-300 w-full rounded-lg py-2.5 cursor-pointer hover:bg-primary hover:text-white transition duration-300"
+          >
+            Show more
+          </button>
+          {showReviewModal && <AllReviewDisplayModal />}
         </div>
       </div>
     </div>
