@@ -21,6 +21,7 @@ export const AppContextProvider = ({ children }) => {
   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
   const [showEditProductModal, setShowEditProductModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [mockReviews, setMockReviews] = useState([]);
 
   //Fetch Seller Status
   const fetchSeller = async () => {
@@ -105,6 +106,12 @@ export const AppContextProvider = ({ children }) => {
     return Math.floor(amount * 100) / 100;
   };
 
+  //fetch reviews
+  const fetchReviews = async (productId) => {
+    const { data } = await axios.get(`api/review/get-reviews/${productId}`);
+    setMockReviews(data.reviews);
+  };
+
   useEffect(() => {
     fetchSeller();
     fetchUser();
@@ -153,6 +160,9 @@ export const AppContextProvider = ({ children }) => {
     setShowEditProductModal,
     showReviewModal,
     setShowReviewModal,
+    fetchReviews,
+    mockReviews,
+    setMockReviews,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -20,8 +20,9 @@ export const addReview = async (req, res) => {
 };
 
 export const getProductReviews = async (req, res) => {
-  const { productId } = req.params;
-  const review = await ReviewModel.find({ productId });
-
-  res.json({ success: true, review });
+  try {
+    const { productId } = req.params;
+    const reviews = await ReviewModel.find({ productId }).populate("userId");
+    res.json({ success: true, reviews });
+  } catch (err) {}
 };

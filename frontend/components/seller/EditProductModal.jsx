@@ -37,7 +37,7 @@ export default function EditProductModal({ product }) {
 
       Object.entries(updatedProductData).forEach(([key, value]) => {
         if (key === "imagesData") {
-          value.forEach((item, index) => {
+          value.forEach((item) => {
             if (item instanceof File) {
               formData.append("files", item);
             } else {
