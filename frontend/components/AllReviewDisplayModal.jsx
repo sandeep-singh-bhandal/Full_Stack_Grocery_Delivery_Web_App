@@ -1,5 +1,4 @@
 import { useAppContext } from "../context/AppContext";
-import { useState } from "react";
 import { assets } from "../assets/assets";
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { LiaTimesSolid } from "react-icons/lia";
@@ -46,8 +45,7 @@ const StarRating = ({ rating, size = "default" }) => {
 1;
 
 export default function AllReviewDisplayModal() {
-  const { setShowReviewModal, mockReviews } = useAppContext();
-  const [loading, setLoading] = useState(false);
+  const { setShowReviewModal, reviews } = useAppContext();
 
   return (
     <div
@@ -65,7 +63,7 @@ export default function AllReviewDisplayModal() {
             onClick={() => setShowReviewModal(false)}
           />
           <h1 className="text-3xl mb-5">Customer Reviews</h1>
-          {mockReviews.map((review) => (
+          {reviews.map((review) => (
             <div
               key={review._id}
               className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow p-4"

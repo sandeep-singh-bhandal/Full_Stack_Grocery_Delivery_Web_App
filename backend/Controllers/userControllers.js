@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import AddressModel from "../Models/Address.js";
 import z from "zod";
 import transporter from "../Config/nodemailer.js";
+import ReviewModel from "../Models/Reviews.js";
 
 //Registering User - /api/user/register
 export const register = async (req, res) => {
@@ -116,6 +117,8 @@ export const deleteAccount = async (req, res) => {
   try {
     const { userId } = req.user;
     await UserModel.findByIdAndDelete(userId);
+    await AddressModel.deleteMany({ userId });
+    await ReviewModel.deleteMany({ userId });
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -252,6 +255,11 @@ export const resetPassword = async (req, res) => {
       { email },
       { password: hashedPassword, resetCode: "", resetCodeExpireAt: "" }
     );
+    res.clearCookie("passwordResetToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
     res.json({ success: true, message: "Password reset successfully" });
   } catch (err) {
     res.json({ success: false, error: err.message });

@@ -16,7 +16,7 @@ export const AppContextProvider = ({ children }) => {
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
-  const [searchQuery, setSearchQuery] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
   const [showEditProductModal, setShowEditProductModal] = useState(false);
@@ -79,10 +79,15 @@ export const AppContextProvider = ({ children }) => {
   };
 
   // Remove from cart function
-  const removeFromCart = (itemId) => {
+  const removeFromCart = (itemId, all) => {
     let cartData = structuredClone(cartItems);
-    delete cartData[itemId];
-    toast.success("Item removed from cart");
+    if (all) {
+      delete cartData[itemId];
+      toast.success("Item removed from cart");
+    } else {
+      cartData[itemId] -= 1;
+      toast.success("Item removed from cart");
+    }
     setCartItems(cartData);
   };
 

@@ -20,7 +20,6 @@ const MyOrders = () => {
   useEffect(() => {
     if (user) fetchMyOrders();
   }, [user]);
-  console.log(myOrders);
 
   return (
     <div className="mt-16 pb-16">

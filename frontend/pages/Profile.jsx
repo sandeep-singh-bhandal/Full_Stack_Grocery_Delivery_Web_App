@@ -36,7 +36,6 @@ const Profile = () => {
       console.log(err.message);
     }
   };
-  console.log(formData.addresses);
   
 
   useEffect(() => {

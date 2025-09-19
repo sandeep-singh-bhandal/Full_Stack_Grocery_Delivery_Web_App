@@ -51,10 +51,10 @@ const Cart = () => {
 
   const placeOrder = async () => {
     try {
-      if (!selectedAddress ) {
+      if (!selectedAddress) {
         return toast.error("Please select an address");
       }
-      if (cartArray.length===0 ) {
+      if (cartArray.length === 0) {
         return toast.error("Please add a product");
       }
 
@@ -158,7 +158,7 @@ const Cart = () => {
               {product.offerPrice * product.quantity}
             </p>
             <button
-              onClick={() => removeFromCart(product._id)}
+              onClick={() => removeFromCart(product._id, true)}
               className="cursor-pointer mx-auto"
             >
               <img

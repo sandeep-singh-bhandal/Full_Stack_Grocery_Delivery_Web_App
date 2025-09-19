@@ -17,11 +17,12 @@ const ProductCard = ({ product }) => {
     (data) => data.productId === product._id
   );
 
-  const averageRating =
+  const averageRating = (
     productReviews
       .map((data) => data.rating)
-      .reduce((acc, num) => acc + num, 0) /
-    productReviews.length.toString().slice(0, 3);
+      .reduce((acc, num) => acc + num, 0) / productReviews.length
+  )
+    .toFixed(1)
 
   useEffect(() => {
     fetchAllReviews();
@@ -93,7 +94,7 @@ const ProductCard = ({ product }) => {
               ) : (
                 <div className="flex items-center justify-center gap-2 md:w-20 w-16 h-[34px] bg-primary/25 rounded select-none">
                   <button
-                    onClick={() => removeFromCart(product._id)}
+                    onClick={() => removeFromCart(product._id, false)}
                     className="cursor-pointer text-md px-2 h-full"
                   >
                     -

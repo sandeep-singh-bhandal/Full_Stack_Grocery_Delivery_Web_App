@@ -24,7 +24,10 @@ export const getProductReviews = async (req, res) => {
     const { productId } = req.params;
 
     const reviews = await ReviewModel.find({ productId })
-      .populate("userId")
+      .populate({
+        path: "userId",
+        select: "name",
+      })
       .sort({ createdAt: -1 });
     res.json({ success: true, reviews });
   } catch (err) {

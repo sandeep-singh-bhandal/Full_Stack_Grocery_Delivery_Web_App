@@ -19,18 +19,13 @@ export default function ReviewSection({ productId }) {
     reviews,
     user,
   } = useAppContext();
-  console.log(reviews);
-  
 
   // Calculate rating statistics
   const ratingStats = {
     average: (
-      reviews
-        .map((data) => data.rating)
-        .reduce((acc, num) => acc + num, 0) / reviews.length
-    )
-      .toString()
-      .slice(0, 3),
+      reviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
+      reviews.length
+    ).toFixed(1),
     total: reviews.length,
     distribution: {
       5: reviews.filter((r) => r.rating === 5).length,
@@ -276,7 +271,7 @@ export default function ReviewSection({ productId }) {
                       className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1"
                       onClick={() => handleLikeDislike(review._id, "like")}
                     >
-                      {review.likes.includes(user._id) ? (
+                      {review.likes.includes(user && user._id) ? (
                         <BiSolidLike />
                       ) : (
                         <BiLike />
@@ -287,7 +282,7 @@ export default function ReviewSection({ productId }) {
                       className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1"
                       onClick={() => handleLikeDislike(review._id, "dislike")}
                     >
-                      {review.dislikes.includes(user._id) ? (
+                      {review.dislikes.includes(user && user._id) ? (
                         <BiSolidDislike />
                       ) : (
                         <BiDislike />

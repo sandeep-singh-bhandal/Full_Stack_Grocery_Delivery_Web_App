@@ -15,7 +15,6 @@ const Navbar = () => {
     setSearchQuery,
     getCartItemCount,
     axios,
-    showDeleteAccountModal,
     setShowDeleteAccountModal
   } = useAppContext();
 
@@ -34,8 +33,6 @@ const Navbar = () => {
     }
   };
 
-  
-
   useEffect(() => {
     if (searchQuery.length > 0) {
       navigate("/products");
@@ -51,12 +48,13 @@ const Navbar = () => {
       {/* Desktop Menu */}
       <div className="hidden sm:flex items-center gap-8">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/products">Products</NavLink>
+        <NavLink to="/products" onClick={()=>setSearchQuery("")}>Products</NavLink>
 
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
           <input
             className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
             type="text"
+            value={searchQuery}
             placeholder="Search products"
             onChange={(e) => setSearchQuery(e.target.value)}
           />

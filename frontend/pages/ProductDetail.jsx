@@ -14,8 +14,8 @@ const ProductDetail = () => {
   
   reviews
   const averageRating =
-    reviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
-    reviews.length.toString().slice(0, 3);
+    (reviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
+    reviews.length).toFixed(1);
     
 
   useEffect(() => {
