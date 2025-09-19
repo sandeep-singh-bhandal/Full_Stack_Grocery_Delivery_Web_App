@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AllReviewDisplayModal from "./AllReviewDisplayModal";
 import { useAppContext } from "../context/AppContext";
-import { AiOutlineDislike, AiOutlineLike } from "react-icons/ai";
+import { BiLike, BiDislike, BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { assets } from "../assets/assets";
 
@@ -10,6 +10,8 @@ export default function ReviewSection({ productId }) {
     rating: 0,
     comment: "",
   });
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
 
   const {
     showReviewModal,
@@ -17,14 +19,18 @@ export default function ReviewSection({ productId }) {
     axios,
     fetchReviews,
     mockReviews,
+    user,
   } = useAppContext();
 
   // Calculate rating statistics
   const ratingStats = {
-    average:
+    average: (
       mockReviews
         .map((data) => data.rating)
-        .reduce((acc, num) => acc + num, 0) / mockReviews.length,
+        .reduce((acc, num) => acc + num, 0) / mockReviews.length
+    )
+      .toString()
+      .slice(0, 3),
     total: mockReviews.length,
     distribution: {
       5: mockReviews.filter((r) => r.rating === 5).length,
@@ -123,6 +129,19 @@ export default function ReviewSection({ productId }) {
       fetchReviews(productId);
     }
   };
+  const handleLikeDislike = async (reviewId, action) => {
+    const { data } = await axios.patch(`/api/review/like-dislike/${reviewId}`, {
+      action,
+    });
+
+    if (data.success) {
+      toast.success(data.message);
+      fetchReviews(productId);
+    } else {
+      toast.error(data.message);
+      console.log(data);
+    }
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -141,12 +160,16 @@ export default function ReviewSection({ productId }) {
       <h1 className="text-3xl font-semibold mb-6">Customer Reviews</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side - Rating Summary and Form */}
-        <div className="space-y-8">
+        <div className="space-y-12">
           {/* Average Rating Display */}
           <div className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm p-6">
             <div className="text-center mb-6">
               <div className="text-4xl font-bold text-foreground mb-2">
-                {ratingStats.average}
+                {ratingStats.average === "NaN" ? (
+                  <span className="text-[25px]">No Reviews Yet</span>
+                ) : (
+                  ratingStats.average
+                )}
               </div>
               <StarRating rating={ratingStats.average} />
               <p className="text-muted-foreground mt-2">
@@ -170,7 +193,7 @@ export default function ReviewSection({ productId }) {
           {/* Review Form */}
           <div className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm p-6">
             <h3 className="text-xl font-semibold mb-4">Write a Review</h3>
-            <form onSubmit={handleSubmitReview} className="space-y-4">
+            <form onSubmit={handleSubmitReview} className="space-y-8">
               <div>
                 <InteractiveStarRating
                   rating={newReview.rating}
@@ -217,50 +240,77 @@ export default function ReviewSection({ productId }) {
         {/* Right Side - Reviews List */}
         <div className="space-y-4">
           <div className="space-y-4">
-            {mockReviews.map((review) => (
-              <div
-                key={review._id}
-                className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow p-4"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="flex gap-1 items-center">
-                      <img src={assets.profile_icon} alt="dp" className="h-7" />
-                      <h4 className="font-medium text-foreground">
-                        {review.userId.name}
-                      </h4>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <StarRating rating={review.rating} />
-                      <span className="text-sm text-muted-foreground">
-                        {formatDate(review.createdAt)}
-                      </span>
+            {mockReviews.length > 0 ? (
+              mockReviews.slice(0, 4).map((review) => (
+                <div
+                  key={review._id}
+                  className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow p-4"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex gap-1 items-center">
+                        <img
+                          src={assets.profile_icon}
+                          alt="dp"
+                          className="h-7"
+                        />
+                        <h4 className="font-medium text-foreground">
+                          {review.userId.name}
+                        </h4>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <StarRating rating={review.rating} />
+                        <span className="text-sm text-muted-foreground">
+                          {formatDate(review.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <p className="text-foreground leading-relaxed mb-3">
-                  {review.comment}
-                </p>
+                  <p className="text-foreground leading-relaxed mb-3">
+                    {review.comment}
+                  </p>
 
-                <div className="flex items-center gap-3">
-                  <button className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1">
-                    <AiOutlineLike />
-                    {review.helpful}
-                  </button>
-                  <button className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1">
-                    <AiOutlineDislike />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1"
+                      onClick={() => handleLikeDislike(review._id, "like")}
+                    >
+                      {review.likes.includes(user._id) ? (
+                        <BiSolidLike />
+                      ) : (
+                        <BiLike />
+                      )}
+                      {review.likes.length}
+                    </button>
+                    <button
+                      className="cursor-pointer text-sm text-muted-foreground transition-colors flex items-center gap-1"
+                      onClick={() => handleLikeDislike(review._id, "dislike")}
+                    >
+                      {review.dislikes.includes(user._id) ? (
+                        <BiSolidDislike />
+                      ) : (
+                        <BiDislike />
+                      )}
+                      {review.dislikes.length}
+                    </button>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-center text-md  w-full h-48 rounded-lg">
+                No Review Yet!
               </div>
-            ))}
+            )}
           </div>
-          <button
-            onClick={() => setShowReviewModal(true)}
-            className="border border-gray-300 w-full rounded-lg py-2.5 cursor-pointer hover:bg-primary hover:text-white transition duration-300"
-          >
-            Show more
-          </button>
+          {mockReviews.length > 4 && (
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="border border-gray-300 w-full rounded-lg py-2.5 cursor-pointer hover:bg-primary hover:text-white transition duration-300"
+            >
+              Show more
+            </button>
+          )}
           {showReviewModal && <AllReviewDisplayModal />}
         </div>
       </div>
