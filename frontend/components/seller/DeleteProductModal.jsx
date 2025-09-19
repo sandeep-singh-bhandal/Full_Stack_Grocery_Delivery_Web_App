@@ -6,24 +6,33 @@ export default function DeleteProductModal({ id, imagesData }) {
 
   const deleteProduct = async (id) => {
     try {
-      const loadingToast = toast.loading("Deleting Product...");
-      const { data } = await axios.post(`/api/product/delete/${id}`, {
+      const promise = axios.post(`/api/product/delete/${id}`, {
         imagesData,
       });
-      toast.dismiss(loadingToast);
-      await fetchProducts();
-      if (data.success) {
-        toast.success(data.message);
-        setShowProductDeleteModal(false);
-      }
+
+      toast.promise(promise, {
+        loading: "Deleting product...",
+        success: () => {
+          setShowProductDeleteModal(false);
+          fetchProducts();
+          return "Product Deleted";
+        },
+        error: "Failed to delete product",
+      });
     } catch (error) {
       toast.error(error.message);
     }
   };
 
   return (
-    <div onClick={()=>setShowProductDeleteModal(false)} className="fixed inset-0 bg-black/40 z-1 flex justify-center items-center backdrop-blur-sm">
-      <div onClick={(e)=>e.stopPropagation()} className="flex flex-col items-center  bg-white shadow-md rounded-xl py-6 px-5 md:w-[460px] w-[370px] border border-gray-200">
+    <div
+      onClick={() => setShowProductDeleteModal(false)}
+      className="fixed inset-0 bg-black/40 z-1 flex justify-center items-center backdrop-blur-sm"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex flex-col items-center  bg-white shadow-md rounded-xl py-6 px-5 md:w-[460px] w-[370px] border border-gray-200"
+      >
         <div className="flex items-center justify-center p-4 bg-red-100 rounded-full">
           <svg
             width="24"

@@ -36,6 +36,8 @@ const Profile = () => {
       console.log(err.message);
     }
   };
+  console.log(formData.addresses);
+  
 
   useEffect(() => {
     getUser();
@@ -76,23 +78,25 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const loadingToast = toast.loading("Updating Product...");
-      const { data } = await axios.patch("/api/user/update-user", formData, {
+      const promise = axios.patch("/api/user/update-user", formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      toast.dismiss(loadingToast);
-      if (data.success) {
-        toast.success(data.message);
-        getUser();
-      } else {
-        if (data.errors) {
-          toast.error(data.errors[0].message);
-        } else {
-          toast.error(data.message);
-        }
-      }
+      toast.promise(promise, {
+        loading: "Updating Profile...",
+        success: () => {
+          getUser();
+          return "Profile updated";
+        },
+        error: (res) => {
+          if (res.errors) {
+            return res.errors[0].message;
+          } else {
+            return res.message;
+          }
+        },
+      });
     } catch (error) {
       toast.error(error);
     }

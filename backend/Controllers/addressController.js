@@ -6,7 +6,7 @@ export const addAddress = async (req, res) => {
     const { address } = req.body;
     const { userId } = req.user;
 
-    const count = await AddressModel.countDocuments();
+    const count = await AddressModel.find({ userId }).countDocuments();
 
     await AddressModel.create({
       ...address,

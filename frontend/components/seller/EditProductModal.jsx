@@ -52,22 +52,22 @@ export default function EditProductModal({ product }) {
           }
         }
       });
-      const loadingToast = toast.loading("Updating Product...");
-      const { data } = await axios.put(
+      const promise = axios.put(
         `/api/product/update/${product._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      toast.dismiss(loadingToast);
-      if (data.success) {
-        toast.success(data.message);
-        fetchProducts();
-        setShowEditProductModal(false);
-      } else {
-        toast.error(data.message);
-      }
+      toast.promise(promise, {
+        loading: "Updating product...",
+        success: () => {
+          setShowEditProductModal(false);
+          fetchProducts();
+          return "Product Updated!";
+        },
+        error: () => "Failed to update product",
+      });
     } catch (error) {
       toast.error(error.message);
     }
@@ -205,7 +205,7 @@ export default function EditProductModal({ product }) {
                   </label>
                   <input
                     onChange={onChangeHandler}
-                    value={updatedProductData.price || null}
+                    value={updatedProductData.price || ""}
                     name="price"
                     type="number"
                     placeholder="0"
@@ -221,7 +221,7 @@ export default function EditProductModal({ product }) {
                   </label>
                   <input
                     onChange={onChangeHandler}
-                    value={updatedProductData.offerPrice || null}
+                    value={updatedProductData.offerPrice || ""}
                     name="offerPrice"
                     type="number"
                     placeholder="0"
@@ -239,6 +239,7 @@ export default function EditProductModal({ product }) {
                 Save
               </button>
               <button
+                type="button"
                 onClick={() => setShowEditProductModal(false)}
                 className="px-8 py-2.5 bg-red-500 text-white font-medium rounded cursor-pointer hover:bg-red-600"
               >

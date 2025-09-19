@@ -21,7 +21,7 @@ const Orders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-  console.log(orders);
+  // console.log(orders[0]);
   
 
   return (
@@ -43,7 +43,7 @@ const Orders = () => {
                 {order.items.map((item, index) => (
                   <div key={index} className="flex flex-col">
                     <p className="font-medium">
-                      {item.product.name}{" "}
+                      {item}{" "}
                       <span className="text-primary">x {item.quantity}</span>
                     </p>
                   </div>

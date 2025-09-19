@@ -13,7 +13,6 @@ const AddProduct = () => {
   });
 
   const [images, setImages] = useState([]);
-
   const { axios, fetchProducts } = useAppContext();
 
   const onSubmitHandler = async (e) => {
@@ -27,23 +26,24 @@ const AddProduct = () => {
       });
       images.forEach((item) => formData.append("files", item));
 
-      const loadingToast = toast.loading("Adding Product...");
-      const { data } = await axios.post("/api/product/add", formData);
-      toast.dismiss(loadingToast);
-      await fetchProducts();
-      if (data.success) {
-        toast.success(data.message);
-        setProductData({
-          name: "",
-          description: "",
-          category: "",
-          price: "",
-          offerPrice: "",
-        });
-        setImages([]);
-      } else {
-        toast.error(data.message);
-      }
+      const promise = axios.post("/api/product/add", formData);
+
+      toast.promise(promise, {
+        loading: "Adding Product...",
+        success: () => {
+          fetchProducts();
+          setProductData({
+            name: "",
+            description: "",
+            category: "",
+            price: "",
+            offerPrice: "",
+          });
+          setImages([])
+          return "Product Added!";
+        },
+        error: "Failed to add",
+      });
     } catch (error) {
       toast.error(error.message);
     }
