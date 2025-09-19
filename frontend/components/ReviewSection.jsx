@@ -10,34 +10,34 @@ export default function ReviewSection({ productId }) {
     rating: 0,
     comment: "",
   });
-  const [isLiked, setIsLiked] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
 
   const {
     showReviewModal,
     setShowReviewModal,
     axios,
     fetchReviews,
-    mockReviews,
+    reviews,
     user,
   } = useAppContext();
+  console.log(reviews);
+  
 
   // Calculate rating statistics
   const ratingStats = {
     average: (
-      mockReviews
+      reviews
         .map((data) => data.rating)
-        .reduce((acc, num) => acc + num, 0) / mockReviews.length
+        .reduce((acc, num) => acc + num, 0) / reviews.length
     )
       .toString()
       .slice(0, 3),
-    total: mockReviews.length,
+    total: reviews.length,
     distribution: {
-      5: mockReviews.filter((r) => r.rating === 5).length,
-      4: mockReviews.filter((r) => r.rating === 4).length,
-      3: mockReviews.filter((r) => r.rating === 3).length,
-      2: mockReviews.filter((r) => r.rating === 2).length,
-      1: mockReviews.filter((r) => r.rating === 1).length,
+      5: reviews.filter((r) => r.rating === 5).length,
+      4: reviews.filter((r) => r.rating === 4).length,
+      3: reviews.filter((r) => r.rating === 3).length,
+      2: reviews.filter((r) => r.rating === 2).length,
+      1: reviews.filter((r) => r.rating === 1).length,
     },
   };
 
@@ -240,8 +240,8 @@ export default function ReviewSection({ productId }) {
         {/* Right Side - Reviews List */}
         <div className="space-y-4">
           <div className="space-y-4">
-            {mockReviews.length > 0 ? (
-              mockReviews.slice(0, 4).map((review) => (
+            {reviews.length > 0 ? (
+              reviews.slice(0, 4).map((review) => (
                 <div
                   key={review._id}
                   className="bg-card text-card-foreground rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow p-4"
@@ -303,7 +303,7 @@ export default function ReviewSection({ productId }) {
               </div>
             )}
           </div>
-          {mockReviews.length > 4 && (
+          {reviews.length > 4 && (
             <button
               onClick={() => setShowReviewModal(true)}
               className="border border-gray-300 w-full rounded-lg py-2.5 cursor-pointer hover:bg-primary hover:text-white transition duration-300"

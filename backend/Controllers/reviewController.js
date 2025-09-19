@@ -22,9 +22,19 @@ export const addReview = async (req, res) => {
 export const getProductReviews = async (req, res) => {
   try {
     const { productId } = req.params;
+
     const reviews = await ReviewModel.find({ productId })
       .populate("userId")
       .sort({ createdAt: -1 });
+    res.json({ success: true, reviews });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+export const getAllReviews = async (req, res) => {
+  try {
+    const reviews = await ReviewModel.find();
     res.json({ success: true, reviews });
   } catch (err) {
     console.log(err.message);

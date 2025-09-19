@@ -1,9 +1,32 @@
+import { useEffect } from "react";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 
 const ProductCard = ({ product }) => {
-  const { currency, addToCart, removeFromCart, navigate, cartItems } =
-    useAppContext();
+  const {
+    currency,
+    addToCart,
+    removeFromCart,
+    navigate,
+    cartItems,
+    allReviews,
+    fetchAllReviews,
+  } = useAppContext();
+
+  const productReviews = allReviews.filter(
+    (data) => data.productId === product._id
+  );
+
+  const averageRating =
+    productReviews
+      .map((data) => data.rating)
+      .reduce((acc, num) => acc + num, 0) /
+    productReviews.length.toString().slice(0, 3);
+
+  useEffect(() => {
+    fetchAllReviews();
+  }, []);
+
   return (
     product && (
       <div
@@ -34,10 +57,15 @@ const ProductCard = ({ product }) => {
                 <img
                   key={i}
                   className="md:w-3.5 w-3"
-                  src={i < 4 ? assets.star_icon : assets.star_dull_icon}
+                  src={
+                    i < Math.floor(averageRating)
+                      ? assets.star_icon
+                      : assets.star_dull_icon
+                  }
                   alt=""
                 />
               ))}
+            {isNaN(averageRating) ? "" : averageRating}
           </div>
           <div className="flex items-end justify-between mt-3">
             <p className="md:text-xl text-base font-medium text-primary">

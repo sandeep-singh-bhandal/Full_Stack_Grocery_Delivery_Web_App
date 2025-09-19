@@ -6,11 +6,17 @@ import ProductCard from "../components/ProductCard";
 import ReviewSection from "../components/ReviewSection";
 
 const ProductDetail = () => {
-  const { products, navigate, currency, addToCart } = useAppContext();
+  const { products, navigate, currency, addToCart, reviews } = useAppContext();
   const { id } = useParams();
   const [thumbnail, setThumbnail] = React.useState(null);
   const [relatedProducts, setRelatedProducts] = React.useState([]);
   const product = products?.find((item) => item._id === id);
+  
+  reviews
+  const averageRating =
+    reviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
+    reviews.length.toString().slice(0, 3);
+    
 
   useEffect(() => {
     if (product) {
@@ -28,7 +34,11 @@ const ProductDetail = () => {
   }, [product]);
 
   if (!product) {
-    return <div className="mt-12">Loading product...</div>;
+    return (
+      <div className="flex items-center justify-center py-50 mt-12 text-3xl">
+        Loading product...
+      </div>
+    );
   }
 
   return (
@@ -46,7 +56,7 @@ const ProductDetail = () => {
         <div className="flex flex-col md:flex-row gap-16 mt-4">
           <div className="flex gap-3">
             <div className="flex flex-col gap-3">
-              {product.imagesData.map(({ url, publicId }, index) => (
+              {product.imagesData.map(({ url }, index) => (
                 <div
                   key={index}
                   onClick={() => setThumbnail(url)}
@@ -75,12 +85,14 @@ const ProductDetail = () => {
                 .map((_, i) => (
                   <img
                     key={i}
-                    src={i < 4 ? assets.star_icon : assets.star_dull_icon}
+                    src={i < Math.floor(averageRating) ? assets.star_icon : assets.star_dull_icon}
                     alt="star"
                     className="md:w-4 w-3.5"
                   />
                 ))}
-              <p className="text-base ml-2">4</p>
+              <p className="text-base ml-2">
+                {isNaN(averageRating) ? "" : averageRating}
+              </p>
             </div>
 
             <div className="mt-6">
