@@ -44,7 +44,7 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
 | Frontend   | React.js, Tailwind CSS, Prebuilt UI |
 | Backend    | Node.js, Express.js, Zod            |
 | Database   | MongoDB                             |
-| State Mgmt | Context API                         |
+| State Management | Context API                         |
 | Auth       | JWT & Cookies                       |
 
 ---
@@ -64,7 +64,7 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
    ```bash
    git clone https://github.com/sandeep-singh-bhandal/Full_Stack_Grocery_Delivery_Web_App.git
 
-   cd ecommerce-project
+   cd Full_Stack_Grocery_Delivery_Web_App
    ```
 
 2. Install dependencies
@@ -103,7 +103,7 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
    SELLER_EMAIL=your_seller_email
    SELLER_PASSWORD=your_seller_password
 
-   #CLludinary for image uploads
+   #Cloudinary for image uploads
    CLOUDINARY_CLOUD_NAME=your_cloudinary_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
@@ -143,7 +143,7 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
 
 ### 1. Homepage
 
-![Homepage](images/homepage.png)
+![Homepage](images/Homepage.png)
 
 ### 2. Products Page
 
