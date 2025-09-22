@@ -3,8 +3,8 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { loginSchema } from "../../validation/login.js";
-import { registerSchema } from "../../validation/register.js";
+import {loginSchema} from "validation";
+import { registerSchema } from "validation";
 
 const Login = () => {
   const [state, setState] = React.useState("login");

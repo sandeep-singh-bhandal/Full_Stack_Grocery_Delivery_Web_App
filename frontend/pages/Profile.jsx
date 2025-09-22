@@ -3,7 +3,7 @@ import { assets } from "../assets/assets";
 import { MdEmail, MdLocalPhone, MdLocationOn } from "react-icons/md";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
-import { updateDetailsSchema } from "../../validation/userDetails.js";
+import { updateDetailsSchema } from "validation";
 
 const Profile = () => {
   const { axios, navigate } = useAppContext();

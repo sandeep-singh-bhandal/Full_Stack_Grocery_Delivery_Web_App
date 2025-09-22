@@ -1,7 +1,7 @@
-import { loginSchema } from "../../validation/login.js";
-import { newPasswordSchema } from "../../validation/newPassword.js";
-import { registerSchema } from "../../validation/register.js";
-import { updateDetailsSchema } from "../../validation/userDetails.js";
+import { loginSchema } from "validation";
+import { newPasswordSchema } from "validation";
+import { registerSchema } from "validation";
+import { updateDetailsSchema } from "validation";
 
 //Registration Validation Middleware
 export const registerValidator = async (req, res, next) => {

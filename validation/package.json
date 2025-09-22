@@ -1,7 +1,7 @@
 {
   "name": "validation",
   "version": "1.0.0",
-  "main": "login.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "start" : "login.js",

@@ -2,7 +2,6 @@
 
 import OrderModel from "../Models/Orders.js";
 import ProductModel from "../Models/Product.js";
-import stripe from "stripe";
 
 export const placeOrderCOD = async (req, res) => {
   try {

@@ -23,7 +23,7 @@ const allowedOrigins = [
 ];
 
 // Connecting To Mongo DB
-await connectDatabase();
+await connectDatabase()
 
 // Connecting To Cloudinary
 await connectCloudinary();
