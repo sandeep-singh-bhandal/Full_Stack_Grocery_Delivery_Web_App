@@ -12,7 +12,6 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = React.useState([]);
   const product = products?.find((item) => item._id === id);
   
-  reviews
   const averageRating =
     (reviews.map((data) => data.rating).reduce((acc, num) => acc + num, 0) /
     reviews.length).toFixed(1);

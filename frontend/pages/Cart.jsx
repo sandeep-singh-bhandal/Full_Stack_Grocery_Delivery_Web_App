@@ -38,9 +38,9 @@ const Cart = () => {
       const { data } = await axios.get("/api/address/get");
       if (data.success) {
         setAddresses(data.addresses);
-        if (data.addresses.length > 0) {
-          setSelectedAddress(data.addresses[0]);
-        }
+        const defaultAddress = data.addresses.filter(addr=> addr.isDefault)
+        setSelectedAddress(defaultAddress[0]);
+        
       } else {
         toast.error(data.message);
       }
@@ -213,7 +213,7 @@ const Cart = () => {
                       setSelectedAddress(address);
                       setShowAddress(false);
                     }}
-                    className="text-gray-500 p-2 hover:bg-gray-100"
+                    className="text-gray-500 p-2 hover:bg-gray-100 cursor-pointer"
                   >
                     {address.street}, {address.city}, {address.state},
                     {address.country}

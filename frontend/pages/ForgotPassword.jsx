@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { IoLockClosed } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { emailSchema, newPasswordSchema } from "../../validation/newPassword";
 
 const ForgotPassword = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,20 +62,30 @@ const ForgotPassword = () => {
     }
   };
   const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const { data } = await axios.post("/api/user/request-code", {
-      email: formData.email,
-    });
-    data.success
-      ? (toast.success(data.message),
-        setStep(1),
-        setSearchParams({ step: "1" }))
-      : setSignUpError(data.message ? data.message : data.errors);
+    try {
+      e.preventDefault();
+      if (!formData.email) return setSignUpError("Email is required");
+      emailSchema.parse({ email: formData.email });
+      setLoading(true);
+      const { data } = await axios.post("/api/user/request-code", {
+        email: formData.email,
+      });
+      data.success
+        ? (toast.success(data.message),
+          setStep(1),
+          setSearchParams({ step: "1" }))
+        : toast.error(data.message);
+    } catch (error) {
+      setSignUpError(JSON.parse(error));
+    }
     setLoading(false);
   };
+
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.code || formData.code.length < 6) {
+      return toast.error("Plase enter the 6 digit code");
+    }
     setLoading(true);
     const { data } = await axios.post("/api/user/verify-code", {
       email: formData.email,
@@ -83,27 +94,35 @@ const ForgotPassword = () => {
     data.success
       ? (toast.success(data.message),
         setStep(2),
-        setLoading(false),
         setSearchParams({ step: "2" }))
       : toast.error(data.message);
     setLoading(false);
   };
   const handlePasswordReset = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const { data } = await axios.post("/api/user/reset-password", {
-      email: formData.email,
-      newPassword: formData.newPassword,
-      confirmNewPassword: formData.confirmNewPassword,
-    });
-    data.success
-      ? (toast.success(data.message),
-        setStep(0),
-        setLoading(false),
-        sessionStorage.clear(),
-        setSearchParams({}),
-        navigate("/"))
-      : setSignUpError(data.message ? data.message : data.errors);
+    try {
+      e.preventDefault();
+      if (!formData.newPassword)
+        return toast.error("Please set a new password");
+      newPasswordSchema.parse({
+        newPassword: formData.newPassword,
+        confirmNewPassword: formData.confirmNewPassword,
+      });
+      setLoading(true);
+      const { data } = await axios.post("/api/user/reset-password", {
+        email: formData.email,
+        newPassword: formData.newPassword,
+        confirmNewPassword: formData.confirmNewPassword,
+      });
+      data.success
+        ? (toast.success(data.message),
+          setStep(0),
+          sessionStorage.clear(),
+          setSearchParams({}),
+          navigate("/"))
+        : toast.error(data.message);
+    } catch (error) {
+      setSignUpError(JSON.parse(error));
+    }
     setLoading(false);
   };
 
@@ -151,7 +170,11 @@ const ForgotPassword = () => {
           )}
           <input
             name="email"
-            className="w-full border-2 mt-1 border-gray-500/30 focus:border-primary outline-none rounded py-2.5 px-4"
+            className={` ${
+              signUpError
+                ? "border-red-500"
+                : "border-gray-500/30 focus:border-primary"
+            } w-full border-2 mt-1  outline-none rounded py-2.5 px-4`}
             placeholder="Enter your email"
             value={formData.email}
             onChange={(e) => {
@@ -262,15 +285,25 @@ const ForgotPassword = () => {
           ) : (
             <span className="float-left mt-4">New Password</span>
           )}
-          <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
+          <div
+            className={`${
+              signUpError && signUpError[0].path[0] === "newPassword"
+                ? "border-red-500"
+                : "border-gray-300/80"
+            } relative flex items-center mt-4 w-full bg-white border-2  h-12 overflow-hidden pl-2 rounded-lg gap-2`}
+          >
             <IoLockClosed className="h-5 w-5" />
             <input
               type={showPassword ? "text" : "password"}
+              value={formData.newPassword}
               name="newPassword"
               placeholder="Password"
               autoComplete="off"
               className="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full"
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                setSignUpError("");
+              }}
             />
             <button
               type="button"
@@ -287,14 +320,22 @@ const ForgotPassword = () => {
             </span>
           ) : typeof signUpError === "string" &&
             signUpError.toLowerCase().includes("incorrect") ? (
-            <span className="float-left mt-4">New Password</span>
+            <span className="float-left mt-4">Confirm Password</span>
           ) : (
-            <span className="float-left mt-4">New Password</span>
+            <span className="float-left mt-4">Confirm Password</span>
           )}
-          <div className="relative flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 overflow-hidden pl-2 rounded-lg gap-2">
+          <div
+            className={`${
+              signUpError && signUpError[0].path[0] === "confirmNewPassword"
+                ? "border-red-500"
+                : "border-gray-300/80"
+            }
+             relative flex items-center mt-4 w-full bg-white border-2 border-gray-300/80  h-12 overflow-hidden pl-2 rounded-lg gap-2`}
+          >
             <IoLockClosed className="h-5 w-5" />
             <input
               type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmNewPassword}
               placeholder="Confirm Password"
               autoComplete="off"
               className="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full"

@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { loginSchema } from "../../validation/login.js";
+import { registerSchema } from "../../validation/register.js";
 
 const Login = () => {
   const [state, setState] = React.useState("login");
@@ -12,12 +14,25 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const [signUpError, setSignUpError] = React.useState("");
+  const [signUpError, setSignUpError] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
+
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      if (state === "register" && !name) {
+        return setSignUpError("Name is required");
+      }
+      if (!email) return setSignUpError("Email is required");
+      if (!password) return setSignUpError("Password is required");
+
+      // Zod Validation
+      state === "login"
+        ? loginSchema.parse({ email, password })
+        : registerSchema.parse({ name, email, password, confirmPassword });
+
+      // API call
       setLoading(true);
       const { data } = await axios.post(
         `/api/user/${state}`,
@@ -25,21 +40,27 @@ const Login = () => {
           ? { email, password }
           : { email, name, password, confirmPassword }
       );
+
       if (data.success) {
         navigate("/");
         setUser(data.user);
         toast.success(data.message);
         setShowUserLogin(false);
       } else {
-        setSignUpError(data.message ? data.message : data.errors);
+        setSignUpError(data.message);
         setShowUserLogin(true);
       }
     } catch (error) {
-      toast.error(error.message);
+      setSignUpError(JSON.parse(error));
       setShowUserLogin(true);
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    setSignUpError();
+  }, [state]);
+
   return (
     <div
       onClick={() => setShowUserLogin(false)}

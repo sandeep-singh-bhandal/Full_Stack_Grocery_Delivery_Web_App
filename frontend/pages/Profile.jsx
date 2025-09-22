@@ -3,6 +3,7 @@ import { assets } from "../assets/assets";
 import { MdEmail, MdLocalPhone, MdLocationOn } from "react-icons/md";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { updateDetailsSchema } from "../../validation/userDetails.js";
 
 const Profile = () => {
   const { axios, navigate } = useAppContext();
@@ -36,7 +37,6 @@ const Profile = () => {
       console.log(err.message);
     }
   };
-  
 
   useEffect(() => {
     getUser();
@@ -77,6 +77,13 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!formData.email) return toast.error("Please provide an Email");
+      if (!formData.name) return toast.error("Please provide a Name");
+      updateDetailsSchema.parse({
+        email: formData.email,
+        username: formData.name,
+        phone: formData.phone,
+      });
       const promise = axios.patch("/api/user/update-user", formData, {
         headers: {
           "Content-Type": "application/json",
@@ -89,15 +96,13 @@ const Profile = () => {
           return "Profile updated";
         },
         error: (res) => {
-          if (res.errors) {
-            return res.errors[0].message;
-          } else {
-            return res.message;
-          }
+          return res.message
         },
       });
     } catch (error) {
-      toast.error(error);
+      console.log(JSON.parse(error));
+
+      toast.error(JSON.parse(error)[0].message);
     }
   };
 
@@ -154,11 +159,24 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
+              <div className="pt-6">
+                <button
+                  type="submit"
+                  form="profile-form"
+                  className="w-full md:w-auto px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dull  cursor-pointer transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Edit Form - Right Side */}
-          <form onSubmit={handleSubmit} className="lg:col-span-2">
+          <form
+            onSubmit={handleSubmit}
+            id="profile-form"
+            className="lg:col-span-2"
+          >
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">
                 Edit Profile
@@ -189,7 +207,7 @@ const Profile = () => {
                         Email
                       </label>
                       <input
-                        type="email"
+                        type="text"
                         value={formData.email || ""}
                         onChange={(e) =>
                           handleInputChange("email", e.target.value)
@@ -418,16 +436,6 @@ const Profile = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-
-                {/* Save Button */}
-                <div className="border-t pt-6">
-                  <button
-                    type="submit"
-                    className="w-full md:w-auto px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dull  cursor-pointer transition-colors"
-                  >
-                    Save Changes
-                  </button>
                 </div>
               </div>
             </div>

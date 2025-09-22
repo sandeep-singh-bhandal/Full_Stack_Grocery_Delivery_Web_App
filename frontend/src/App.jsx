@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Home from "../pages/Home";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -25,7 +24,7 @@ const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
   const isForgotPasswordPath =
     useLocation().pathname.includes("forgot-password");
-  const { showUserLogin, isSeller, showDeleteAccountModal, user } =
+  const { showUserLogin, isSeller, showDeleteAccountModal } =
     useAppContext();
 
   return (

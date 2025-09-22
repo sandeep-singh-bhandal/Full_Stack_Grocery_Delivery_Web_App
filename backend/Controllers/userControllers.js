@@ -183,8 +183,6 @@ export const requestCode = async (req, res) => {
     const checkEmail = z.object({
       email: z.email("Enter an valid email"),
     });
-    if (!email)
-      return res.json({ success: false, message: "Please enter an email" });
     const result = checkEmail.safeParse({ email });
     if (!result.success) {
       const errors = result.error.issues;
