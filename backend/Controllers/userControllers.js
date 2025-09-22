@@ -2,7 +2,7 @@ import UserModel from "../Models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import AddressModel from "../Models/Address.js";
-import z from "zod";
+import { z } from "zod";
 import transporter from "../Config/nodemailer.js";
 import ReviewModel from "../Models/Reviews.js";
 

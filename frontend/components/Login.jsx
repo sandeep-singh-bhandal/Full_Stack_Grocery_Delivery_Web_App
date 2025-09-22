@@ -1,21 +1,22 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import {loginSchema} from "validation";
-import { registerSchema } from "validation";
+import {loginSchema} from "../../validation/login";
+import { registerSchema } from "../../validation/register";
+import { useState } from "react";
 
 const Login = () => {
-  const [state, setState] = React.useState("login");
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const [signUpError, setSignUpError] = React.useState();
-  const [loading, setLoading] = React.useState(false);
+  const [state, setState] = useState("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [signUpError, setSignUpError] = useState();
+  const [loading, setLoading] = useState(false);
   const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
 
   const onSubmitHandler = async (e) => {
