@@ -2,9 +2,9 @@ import UserModel from "../Models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import AddressModel from "../Models/Address.js";
-import { z } from "zod";
 import transporter from "../Config/nodemailer.js";
 import ReviewModel from "../Models/Reviews.js";
+import { emailSchema } from "../validation/newPassword.js";
 
 //Registering User - /api/user/register
 export const register = async (req, res) => {
@@ -180,10 +180,7 @@ export const updateUser = async (req, res) => {
 export const requestCode = async (req, res) => {
   try {
     const { email } = req.body;
-    const checkEmail = z.object({
-      email: z.email("Enter an valid email"),
-    });
-    const result = checkEmail.safeParse({ email });
+    const result = emailSchema.safeParse({ email });
     if (!result.success) {
       const errors = result.error.issues;
       return res.json({ success: false, errors: errors });

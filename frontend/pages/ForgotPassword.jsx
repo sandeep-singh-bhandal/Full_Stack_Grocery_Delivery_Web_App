@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { IoLockClosed } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { emailSchema, newPasswordSchema } from "../../validation/newPassword";
+import { emailSchema, newPasswordSchema } from "../validation/newPassword";
 
 const ForgotPassword = () => {
   const [searchParams, setSearchParams] = useSearchParams();
