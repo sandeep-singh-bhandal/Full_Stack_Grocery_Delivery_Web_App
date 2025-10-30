@@ -21,7 +21,7 @@ export const sendOtpEmail = async (email, otp) => {
     await tranEmailApi.sendTransacEmail({
       sender,
       to: receivers,
-      subject: "Email Verification Code",
+      subject: "Password Reset Code",
       textContent: `Your 6 digit secret code to reset password is ${otp}.\nUse this to reset your password, the code is valid for 15 minutes only.`,
     });
     return true
