@@ -1,4 +1,4 @@
-# 🛒 Full-Stack E-Commerce Web Application
+# 🛒 Full-Stack E-Commerce Grocery Delivery Web Application
 
 A **full-featured E-Commerce platform** built with the **MERN stack**.  
 Enjoy a smooth shopping experience as a user and a powerful dashboard as a seller to manage products and orders.
