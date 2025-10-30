@@ -2,9 +2,9 @@ import UserModel from "../Models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import AddressModel from "../Models/Address.js";
-import transporter from "../Config/nodemailer.js";
 import ReviewModel from "../Models/Reviews.js";
 import { emailSchema } from "../validation/newPassword.js";
+import { sendOtpEmail } from "../Config/sendOtpMail.js";
 
 //Registering User - /api/user/register
 export const register = async (req, res) => {
@@ -192,12 +192,7 @@ export const requestCode = async (req, res) => {
       { email },
       { resetCode: code, resetCodeExpireAt: Date.now() + 15 * 60 * 1000 }
     );
-    await transporter.sendMail({
-      from: `"GreenCart Admin" <mr.money.bhandal@gmail.com>`,
-      to: email,
-      subject: "Password Reset Code",
-      text: `Your password reset code is ${code}.\nUse this to reset your password, the code is valid for 15 minutes only.`,
-    });
+    await sendOtpEmail(email, code)
 
     res.json({ success: true, message: "Code sent successfully" });
   } catch (err) {
