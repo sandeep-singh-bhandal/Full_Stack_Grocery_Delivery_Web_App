@@ -9,7 +9,7 @@ const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 export const sendOtpEmail = async (email, otp) => {
   const sender = {
     email: "mr.money.bhandal@gmail.com",
-    name: "Chatty Admin"
+    name: "GreenCart Admin"
   };
 
   const receivers = [
@@ -22,7 +22,7 @@ export const sendOtpEmail = async (email, otp) => {
       sender,
       to: receivers,
       subject: "Email Verification Code",
-      textContent: `Your email verification code is ${otp}.\nUse this to verify your email, the code is valid for 15 minutes only.`,
+      textContent: `Your 6 digit secret code to reset password is ${otp}.\nUse this to reset your password, the code is valid for 15 minutes only.`,
     });
     return true
   } catch (error) {
