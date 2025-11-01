@@ -108,9 +108,9 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
 
-   #SMTP details to send mails
-   SMTP_USER=your_smtp_user
-   SMTP_PASS=your_smtp_password
+   #For sending mails
+   BREVO_API_KEY=your_brevo_api_key
+
    ```
 
    For Frontend
@@ -120,7 +120,7 @@ Enjoy a smooth shopping experience as a user and a powerful dashboard as a selle
    VITE_CURRENCY=₹
 
    #Backend Url
-   VITE_BACKEND_URL=http://localhost:3000
+   VITE_BACKEND_URL= your_backend_url
    ```
 
 4. Run the project
